@@ -1,0 +1,30 @@
+package templates
+
+templ Homepage() {
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+@Head("Gopoll")
+<body>
+<h1 class="header">Gopoll</h1>
+<div class="container">
+    <div class="row">
+        <div class="col-sm">
+            <form hx-boost="true" action="/v1/test" id="joinSessionForm">
+                <input type="text" id="joinSessionForm" name="session" placeholder="Enter your session id..."/> <br />
+                <input type="submit" value="Submit" />
+            </form>
+        </div>
+        <div class="col-sm">
+            <form hx-boost="true" action="/v1/test" id="createSessionForm">
+                <input type="text" id="createSessionForm" name="session" placeholder="Enter your session id..."/> <br />
+                <input type="submit" value="Submit" />
+            </form>
+        </div>
+    </div>
+
+</div>
+
+
+</body>
+</html>
+}

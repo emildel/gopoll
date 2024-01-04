@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log/slog"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 )
@@ -18,12 +20,13 @@ type config struct {
 
 type application struct {
 	config config
+	logger *slog.Logger
 }
 
 func main() {
 	var cfg config
 
-	flag.IntVar(&cfg.port, "port", 4000, "API saerver port")
+	flag.IntVar(&cfg.port, "port", 4000, "API server port")
 	flag.StringVar(&cfg.env, "environment", "test-dev", "Environment (test-dev | production)")
 
 	flag.Func("cors-trusted-origins", "Trusted CORS origins (space seperated)", func(s string) error {
@@ -32,8 +35,11 @@ func main() {
 	})
 	flag.Parse()
 
+	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+
 	app := &application{
 		config: cfg,
+		logger: logger,
 	}
 
 	server := &http.Server{
@@ -42,10 +48,13 @@ func main() {
 		IdleTimeout:  time.Minute,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
+		ErrorLog:     slog.NewLogLogger(logger.Handler(), slog.LevelError),
 	}
 
+	logger.Info("starting server", "addr", server.Addr, "env", cfg.env)
+
 	err := server.ListenAndServe()
-	if err != nil {
-		panic(err)
-	}
+
+	logger.Error(err.Error())
+	os.Exit(1)
 }

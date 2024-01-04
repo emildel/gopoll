@@ -1,0 +1,12 @@
+package templates
+
+templ Test(sessionID string) {
+    <!DOCTYPE html>
+    <html lang="en">
+        @Head("Test")
+        <body>
+            <h1>Some test page</h1>
+            <p>Your session: { sessionID }</p>
+        </body>
+    </html>
+}
