@@ -1,11 +1,7 @@
 package templates
 
 templ Healthcheck() {
-    <!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/html">
-        @Head("Healthcheck")
-        <body>
-            <div>Healthcheck</div>
-        </body>
-    </html>
+    @Head("Healthcheck") {
+        <div class="font-bold underline">Healthcheck</div>
+    }
 }
