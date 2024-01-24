@@ -2,20 +2,23 @@ package templates
 
 templ Homepage() {
     @Head("Gopoll") {
-        <h1 class="text-3xl font-bold">Gopoll</h1>
-        <div class="container">
-            <div class="row">
-                <div class="col-sm">
-                    <form hx-boost="true" action="/v1/test" id="joinSessionForm">
-                        <input type="text" id="joinSessionForm" name="session" placeholder="Enter your session id..."/> <br />
-                        <input type="submit" value="Submit" />
-                    </form>
+        <div>
+            <div class="pt-28 pb-20 text-6xl font-extrabold flex justify-center items-center underline">
+                <h1>Gopoll</h1>
+            </div>
+            <div class="submissionForms p-5">
+                <form hx-boost="true" action="/joinSession">
+                    <h1 class="font-bold text-2xl mb-2">Join a session</h1>
+                    <input type="text" id="joinSessionForm" class="p-5 border border-solid border-gray-400" name="session" placeholder="Enter your session id..." autocomplete="off" /> <br />
+                    <input type="submit" value="Enter" class="button buttonSubmit duration-300" />
+                </form>
+            </div>
+            <div class="flex flex-col md:flex-row justify-center items-center gap-4 mt-20">
+                <div class="align-middle">
+                    <h1 class="font-bold text-2xl">Or create one here!</h1>
                 </div>
-                <div class="col-sm">
-                    <form hx-boost="true" action="/v1/test" id="createSessionForm">
-                        <input type="text" id="createSessionForm" name="session" placeholder="Enter your session id..."/> <br />
-                        <input type="submit" value="Submit" />
-                    </form>
+                <div>
+                    <button hx-get="createSession" hx-trigger="click" hx-boost="true" class="bg-slate-50 text-neutral-950 py-5 px-10 text-center duration-300 cursor-pointer border-2 border-solid border-slate-950 hover:bg-[#555555] hover:text-white">Create session</button>
                 </div>
             </div>
         </div>
