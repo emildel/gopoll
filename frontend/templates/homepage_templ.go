@@ -38,7 +38,7 @@ func Homepage() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h1></div><div class=\"submissionForms p-5\"><form hx-boost=\"true\" action=\"/joinSession\"><h1 class=\"font-bold text-2xl mb-2\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h1></div><div class=\"mx-auto w-fit justify-center text-center p-5 bg-[#e1eafa] border-2 border-solid border-slate-950\"><form action=\"/joinSession\"><h1 class=\"font-bold text-2xl mb-2\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -47,7 +47,7 @@ func Homepage() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h1><input type=\"text\" id=\"joinSessionForm\" class=\"p-5 border border-solid border-gray-400\" name=\"session\" placeholder=\"Enter your session id...\" autocomplete=\"off\"><br><input type=\"submit\" value=\"Enter\" class=\"button buttonSubmit duration-300\"></form></div><div class=\"flex flex-col md:flex-row justify-center items-center gap-4 mt-20\"><div class=\"align-middle\"><h1 class=\"font-bold text-2xl\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h1><input type=\"text\" id=\"joinSessionForm\" class=\"p-5 border border-solid border-gray-400\" name=\"session\" placeholder=\"Enter your session id...\" autocomplete=\"off\"><br><input type=\"submit\" value=\"Enter\" class=\"mt-4 bg-slate-50 text-neutral-950 py-5 px-10 text-center duration-300 cursor-pointer border-2 border-solid border-slate-950 hover:bg-[#555555] hover:text-white\"></form></div><div class=\"flex flex-col md:flex-row justify-center items-center gap-4 mt-20\"><div class=\"align-middle\"><h1 class=\"font-bold text-2xl\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -56,7 +56,7 @@ func Homepage() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h1></div><div><button hx-get=\"createSession\" hx-trigger=\"click\" hx-boost=\"true\" class=\"bg-slate-50 text-neutral-950 py-5 px-10 text-center duration-300 cursor-pointer border-2 border-solid border-slate-950 hover:bg-[#555555] hover:text-white\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h1></div><div><button hx-get=\"createSession\" hx-trigger=\"click\" class=\"bg-slate-50 text-neutral-950 py-5 px-10 text-center duration-300 cursor-pointer border-2 border-solid border-slate-950 hover:bg-[#555555] hover:text-white\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

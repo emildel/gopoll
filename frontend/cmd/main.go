@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/go-playground/form/v4"
 	"log/slog"
 	"net/http"
 	"os"
@@ -19,8 +20,9 @@ type config struct {
 }
 
 type application struct {
-	config config
-	logger *slog.Logger
+	config      config
+	logger      *slog.Logger
+	formDecoder *form.Decoder
 }
 
 func main() {
@@ -38,9 +40,12 @@ func main() {
 
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
+	formDecoder := form.NewDecoder()
+
 	app := &application{
-		config: cfg,
-		logger: logger,
+		config:      cfg,
+		logger:      logger,
+		formDecoder: formDecoder,
 	}
 
 	server := &http.Server{

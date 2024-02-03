@@ -32,6 +32,18 @@ func (app *application) routes() http.Handler {
 		templates.CreateSession().Render(r.Context(), w)
 	})
 
+	router.HandlerFunc(http.MethodGet, "/addPollAnswer", func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("HX-Request") != "true" {
+			http.NotFound(w, r)
+			return
+		}
+
+		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.Write([]byte(`<input type="text" name="inputQuestion"/> <br />`))
+	})
+
+	router.HandlerFunc(http.MethodPost, "/createPoll", app.createPollPOST)
+
 	return router
 
 }

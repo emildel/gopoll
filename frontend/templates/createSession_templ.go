@@ -29,7 +29,7 @@ func CreateSession() templ.Component {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
 				defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<h1>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<h1 class=\"flex justify-center text-center pt-28 pb-20 text-3xl font-extrabold underline\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -38,7 +38,72 @@ func CreateSession() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h1>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h1><div class=\"mx-auto align-middle px-4 min-[601px]:text-center min-[601px]:px-0 bg-blue-600\"><form action=\"/createPoll\" method=\"post\"><div id=\"formInputs\" class=\"mx-auto w-full max-w-[800px] bg-green-400 h-[32rem] overflow-y-auto overscroll-contain scrollbar-gutter-stable\"><label for=\"title\" class=\"text-xl float-left w-full min-[601px]:w-1/5 bg-red-400\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Var4 := `Title`
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</label> <input type=\"text\" id=\"title\" name=\"title\" placeholder=\"Title\" class=\"w-full min-[601px]:w-4/5 p-5 border border-solid border-gray-400\"><br><label for=\"inputAnswer1\" class=\"text-xl float-left w-full mt-4 min-[601px]:w-1/5 bg-purple-400\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Var5 := `Answer`
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</label> <input type=\"text\" id=\"inputAnswer1\" name=\"inputAnswer\" placeholder=\"Answer\" class=\"w-full min-[601px]:w-4/5 min-[601px]:mt-4 p-5 border border-solid border-gray-400\"><br></div><input type=\"submit\" value=\"Create poll\" class=\"bg-slate-50 text-neutral-950 py-5 px-10 text-center duration-300 cursor-pointer border-2 border-solid border-slate-950 hover:bg-[#555555] hover:text-white\"></form></div><div><div class=\"bg-red-400 pt-20\"><button id=\"addPollAnswerBtn\" type=\"button\" class=\"bg-slate-50 text-neutral-950 py-5 px-10 text-center duration-300 cursor-pointer border-2 border-solid border-slate-950 hover:bg-[#555555] hover:text-white]\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Var6 := `Add item`
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</button></div></div><script>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Var7 := `
+            (function() {
+                var counter = 2;
+                var btn = document.getElementById('addPollAnswerBtn')
+                var form = document.getElementById('formInputs')
+
+                var addInput = function() {
+                    counter++;
+                    var label = document.createElement("label");
+                    var input = document.createElement("input");
+                    var br = document.createElement('br');
+                    label.htmlFor = 'inputAnswer' + counter;
+                    label.className = 'text-xl float-left w-full mt-4 min-[601px]:w-1/5'
+                    label.innerHTML = 'Answer'
+
+                    input.type = 'text';
+                    input.id = 'inputAnswer' + counter;
+                    input.name = 'inputAnswer';
+                    input.placeholder = 'Answer'
+                    input.className = 'w-full min-[601px]:w-4/5 min-[601px]:mt-4 p-5 border border-solid border-gray-400';
+                    form.appendChild(label);
+                    form.appendChild(input);
+                    form.appendChild(br);
+                };
+
+                btn.addEventListener('click', function() {
+                    addInput();
+                }.bind(this));
+            })();
+        `
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var7)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</script>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
