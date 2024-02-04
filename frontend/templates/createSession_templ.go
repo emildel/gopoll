@@ -29,16 +29,16 @@ func CreateSession() templ.Component {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
 				defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<h1 class=\"flex justify-center text-center pt-14 pb-10 min-[601px]:pt-28 min-[601px]:pb-20 text-3xl font-extrabold underline\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<h1 class=\"flex justify-center text-center px-5 pt-14 pb-10 min-[601px]:pt-28 min-[601px]:pb-20 text-3xl font-extrabold underline\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Var3 := `Create a session here`
+			templ_7745c5c3_Var3 := `Create a poll`
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var3)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h1><div class=\"mx-auto align-middle px-4 min-[601px]:px-0 min-[601px]:text-center bg-blue-600\"><form action=\"/createPoll\" method=\"post\"><div id=\"formInputs\" class=\"mx-auto w-full py-5 min-[601px]:py-10 px-5 min-[601px]:pl-0 max-w-[900px] bg-green-400 h-[32rem] overflow-y-auto overscroll-contain scrollbar-gutter-stable\"><label for=\"title\" class=\"text-xl float-left w-full min-[601px]:w-1/5\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h1><div class=\"mx-auto overflow-hidden align-middle px-4 min-[601px]:px-0 min-[601px]:text-center bg-white\"><form action=\"/createPoll\" method=\"post\"><div id=\"formInputs\" class=\"mx-auto w-full pr-16 p-5 mt-5 min-[601px]:mt-10 min-[601px]:py-10 min-[601px]:pl-0 max-w-[900px] h-[27rem] overflow-y-auto overscroll-auto min-[601px]:overscroll:contain scrollbar-gutter-stable shadow-lg shadow-slate-200 rounded\"><label for=\"title\" class=\"text-xl float-left w-full min-[601px]:w-1/5\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -65,7 +65,7 @@ func CreateSession() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</label> <input type=\"text\" id=\"inputAnswer2\" name=\"inputAnswer\" placeholder=\"Answer\" class=\"w-full min-[601px]:w-4/5 min-[601px]:mt-4 p-5 border rounded-sm border-solid border-gray-400\"><br></div><div class=\"justify-center flex\"><input type=\"submit\" value=\"Create poll\" class=\"bg-slate-50 text-neutral-950 py-5 px-10 duration-300 cursor-pointer border-2 border-solid border-slate-950 hover:bg-[#555555] hover:text-white\"></div></form></div><div><div class=\"bg-red-400 pt-20\"><button id=\"addPollAnswerBtn\" type=\"button\" class=\"bg-slate-50 text-neutral-950 py-5 px-10 text-center duration-300 cursor-pointer border-2 border-solid border-slate-950 hover:bg-[#555555] hover:text-white]\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</label> <input type=\"text\" id=\"inputAnswer2\" name=\"inputAnswer\" placeholder=\"Answer\" class=\"w-full min-[601px]:w-4/5 min-[601px]:mt-4 p-5 border rounded-sm border-solid border-gray-400\"><br></div><div class=\"mx-auto flex flex-col gap-4 my-10 max-w-[900px]\"><button id=\"addPollAnswerBtn\" type=\"button\" class=\"max-w-[300px] text-[#809D80] py-5 duration-300 cursor-pointer border-2 border-[#809D80] hover:underline rounded\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -74,7 +74,7 @@ func CreateSession() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</button></div></div><script>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</button> <input type=\"submit\" value=\"Create poll\" class=\"max-w-[300px] whitespace-normal bg-[#809D80] text-zinc-50 py-5 px-5 duration-300 cursor-pointer border-2 border-slate-950 hover:bg-[#53836D] hover:text-white rounded\"></div></form></div><script>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
