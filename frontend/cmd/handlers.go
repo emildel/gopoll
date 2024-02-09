@@ -1,6 +1,9 @@
 package main
 
-import "net/http"
+import (
+	"github.com/emildel/gopoll/frontend/templates"
+	"net/http"
+)
 
 type createPollForm struct {
 	Title     string   `form:"title"`
@@ -23,9 +26,23 @@ func (app *application) createPollPOST(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write([]byte(form.Title))
+	//---------------------------------------------
 
-	for _, question := range form.Questions {
-		w.Write([]byte(question))
-	}
+	//bar := charts.NewBar()
+	//
+	//bar.SetGlobalOptions(charts.WithTitleOpts(opts.Title{
+	//	Title: "Results",
+	//}))
+	//
+	//data := make([]opts.BarData, 0)
+	//data = append(data, opts.BarData{Value: 5})
+	//data = append(data, opts.BarData{Value: 2})
+	//data = append(data, opts.BarData{Value: 4})
+	//
+	//bar.SetXAxis(form.Questions).
+	//	AddSeries("Count", data, func(s *charts.SingleSeries) {
+	//		charts.WithCircularStyleOpts(opts.CircularStyle{RotateLabel: false})
+	//	})
+
+	templates.Poll(form.Title, form.Questions).Render(r.Context(), w)
 }
