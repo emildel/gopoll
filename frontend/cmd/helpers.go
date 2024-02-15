@@ -2,9 +2,19 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"github.com/go-playground/form/v4"
+	"math/rand"
 	"net/http"
 )
+
+type contextKey string
+
+const sessionIdCtx = contextKey("X-SessionID")
+
+func interfaceToString(input interface{}) string {
+	return fmt.Sprintf("%v", input)
+}
 
 func (app *application) decodePostForm(r *http.Request, dst any) error {
 	err := r.ParseForm()
@@ -27,4 +37,14 @@ func (app *application) decodePostForm(r *http.Request, dst any) error {
 	}
 
 	return nil
+}
+
+func (app *application) generateUniqueSessionId() string {
+	var letters = []rune("0123456789abcdefghijklmnopqrstuvwxyz")
+
+	b := make([]rune, 6)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
 }

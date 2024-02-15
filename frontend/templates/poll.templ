@@ -1,61 +1,13 @@
 package templates
 
-script loadChart(questions []string) {
-
-    var fontSize = 12;
-    if(window.innerWidth > 600) {
-        fontSize = 16;
-    }
-
-    console.log(questions);
-    var data = {
-        labels: questions,
-        datasets: [{
-            label: '# of Votes',
-            borderWidth: 1
-        }]
-    };
-
-    var options = {
-        maintainAspectRatio: true,
-        scales: {
-            y: {
-                beginAtZero: true,
-                grace: 5,
-                ticks: {
-                    stepSize: 5
-                }
-            }
-        }
-    }
 
 
-    Chart.defaults.font.size = fontSize;
+templ Poll(title string, questions []string, isCreator bool) {
 
-    new Chart('myChart1', {
-        type: 'bar',
-        data: data,
-        options: options
-    });
-}
+<!--    if isCreator {-->
+<!--        @PollCreator(title, questions)-->
+<!--    } else {-->
+<!--        @JoinSession("abc123")-->
+<!--    }-->
 
-templ Poll(title string, questions []string) {
-    <body onload={ loadChart(questions) }>
-
-    @Head("GoPoll | Create session") {
-
-        <h1 class="flex justify-center text-center px-5 pt-14 pb-10 min-[601px]:pt-28 min-[601px]:pb-20 text-3xl font-extrabold underline">{ title }</h1>
-
-<!--        <h1>Answers:</h1>-->
-<!--        for _, item := range questions {-->
-<!--            <p> { item } </p>-->
-<!--        }-->
-
-        <div class="bg-[#FCFDFC]">
-             <div class="flex justify-center items-center relative m-auto h-[50vh] max-w-[1200px] px-2 min-[601px]:px-4">
-                <canvas id="myChart1" class=""></canvas>
-            </div>
-        </div>
-    }
-    </body>
 }

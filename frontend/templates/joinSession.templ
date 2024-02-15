@@ -1,8 +1,9 @@
 package templates
 
-templ JoinSession(sessionID string) {
+templ JoinSession(sessionID, title string) {
     @Head("GoPoll | Session") {
         <h1>Some test page</h1>
         <p>Your session: { sessionID }</p>
+        <p>Your title: { title }</p>
     }
 }

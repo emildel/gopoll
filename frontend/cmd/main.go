@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/alexedwards/scs/v2"
 	"github.com/go-playground/form/v4"
+	"github.com/patrickmn/go-cache"
 	"log/slog"
 	"net/http"
 	"os"
@@ -20,9 +22,11 @@ type config struct {
 }
 
 type application struct {
-	config      config
-	logger      *slog.Logger
-	formDecoder *form.Decoder
+	config         config
+	logger         *slog.Logger
+	formDecoder    *form.Decoder
+	sessionManager *scs.SessionManager
+	cacheManager   *cache.Cache
 }
 
 func main() {
@@ -43,9 +47,11 @@ func main() {
 	formDecoder := form.NewDecoder()
 
 	app := &application{
-		config:      cfg,
-		logger:      logger,
-		formDecoder: formDecoder,
+		config:         cfg,
+		logger:         logger,
+		formDecoder:    formDecoder,
+		sessionManager: scs.New(),
+		cacheManager:   cache.New(5*time.Minute, 10*time.Minute),
 	}
 
 	server := &http.Server{
@@ -63,23 +69,5 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
-	/*fileServer := http.FileServer(http.FS(ui.Files))
-	router.Handler(http.MethodGet, "/assets/*filepath", fileServer)
-
-	router.HandlerFunc(http.MethodGet, "/healthcheck", func(w http.ResponseWriter, r *http.Request) {
-		templates.Healthcheck().Render(r.Context(), w)
-	})
-
-	fs := http.FileServer(http.Dir("../styles"))
-	http.Handle("/", fs)
-
-	//http.HandleFunc("/healthcheck", func(w http.ResponseWriter, r *http.Request) {
-	//	templates.Healthcheck().Render(r.Context(), w)
-	//})
-
-	/*http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		templates.Homepage().Render(r.Context(), w)
-	})*/
 
 }
