@@ -1,10 +1,12 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-playground/form/v4"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/patrickmn/go-cache"
 	"log/slog"
 	"net/http"
@@ -18,6 +20,11 @@ type config struct {
 	env  string
 	cors struct {
 		trustedOrigins []string
+	}
+	db struct {
+		dsn             string
+		maxOpenConns    int
+		maxConnLifetime string
 	}
 }
 
@@ -39,10 +46,20 @@ func main() {
 		cfg.cors.trustedOrigins = strings.Fields(s)
 		return nil
 	})
+	flag.StringVar(&cfg.db.dsn, "db-dsn", os.Getenv("GOPOLL_DB_DSN"), "PostgreSQL DSN")
+	flag.IntVar(&cfg.db.maxOpenConns, "db-max-open-conns", 25, "PostgreSQL max open connections")
+	flag.StringVar(&cfg.db.maxConnLifetime, "db-max-idle-time", "15m", "PostgreSQL max connection idle time")
 
 	flag.Parse()
 
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+
+	_, err := openDB(cfg)
+	if err != nil {
+		logger.Error(err.Error())
+	}
+
+	logger.Info("database connection pool established")
 
 	formDecoder := form.NewDecoder()
 
@@ -65,9 +82,30 @@ func main() {
 
 	logger.Info("starting server", "addr", server.Addr, "env", cfg.env)
 
-	err := http.ListenAndServe(fmt.Sprintf(":%d", cfg.port), app.routes())
+	err = http.ListenAndServe(fmt.Sprintf(":%d", cfg.port), app.routes())
 	if err != nil {
 		panic(err)
 	}
+}
 
+func openDB(cfg config) (*pgxpool.Pool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	dbpool, err := pgxpool.New(ctx, cfg.db.dsn)
+	if err != nil {
+		return nil, fmt.Errorf("unable to create connection pool: %v", err)
+	}
+
+	dbpool.Config().MaxConns = int32(cfg.db.maxOpenConns)
+
+	duration, err := time.ParseDuration(cfg.db.maxConnLifetime)
+	if err != nil {
+		return nil, err
+	}
+	dbpool.Config().MaxConnLifetime = duration
+
+	defer dbpool.Close()
+
+	return dbpool, nil
 }
