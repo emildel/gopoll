@@ -27,15 +27,18 @@ func (app *application) routes() http.Handler {
 
 	router.Handler(http.MethodGet, "/joinPoll", dynamic.ThenFunc(app.joinSession))
 
+	// View the new poll creation page
 	router.HandlerFunc(http.MethodGet, "/createPoll", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("HX-Redirect", "/createPoll")
 		templates.CreateSession().Render(r.Context(), w)
 	})
 
+	// First POST call to generate a unique ID to put in the URL
 	router.Handler(http.MethodPost, "/createPoll", dynamic.ThenFunc(app.createPollPOST))
+
+	// Redirect to new URL with the previously created unique ID
 	router.Handler(http.MethodPost, "/createPoll/:sessionId", dynamic.ThenFunc(app.createPollPOSTWithSession))
 	router.Handler(http.MethodGet, "/createPoll/:sessionId", dynamic.ThenFunc(app.createPollPOSTWithSession))
 
 	return router
-
 }

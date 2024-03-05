@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"github.com/alexedwards/scs/pgxstore"
 	"github.com/alexedwards/scs/v2"
 	"github.com/go-playground/form/v4"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -54,10 +55,12 @@ func main() {
 
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
-	_, err := openDB(cfg)
+	dbpool, err := openDB(cfg)
 	if err != nil {
 		logger.Error(err.Error())
 	}
+
+	defer dbpool.Close()
 
 	logger.Info("database connection pool established")
 
@@ -70,6 +73,8 @@ func main() {
 		sessionManager: scs.New(),
 		cacheManager:   cache.New(5*time.Minute, 10*time.Minute),
 	}
+
+	app.sessionManager.Store = pgxstore.New(dbpool)
 
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", cfg.port),
@@ -104,8 +109,6 @@ func openDB(cfg config) (*pgxpool.Pool, error) {
 		return nil, err
 	}
 	dbpool.Config().MaxConnLifetime = duration
-
-	defer dbpool.Close()
 
 	return dbpool, nil
 }

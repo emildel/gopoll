@@ -19,7 +19,7 @@ func (app *application) joinSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pollId, _ := app.cacheManager.Get("PollId")
+	pollId := app.sessionManager.GetString(r.Context(), "PollId")
 	title, _ := app.cacheManager.Get("PollTitle")
 
 	if session == pollId {

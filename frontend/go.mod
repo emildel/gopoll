@@ -4,6 +4,7 @@ go 1.21.4
 
 require (
 	github.com/a-h/templ v0.2.501
+	github.com/alexedwards/scs/pgxstore v0.0.0-20240203174419-a38e822451b6
 	github.com/alexedwards/scs/v2 v2.7.0
 	github.com/go-playground/form/v4 v4.2.1
 	github.com/jackc/pgx/v5 v5.5.3
