@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/emildel/gopoll/frontend/internal/data"
 	"github.com/emildel/gopoll/frontend/templates"
 	"github.com/patrickmn/go-cache"
 	"net/http"
+	"time"
 )
 
 type createPollForm struct {
@@ -14,16 +16,21 @@ type createPollForm struct {
 
 func (app *application) joinSession(w http.ResponseWriter, r *http.Request) {
 	session := r.URL.Query().Get("session")
-	if session == "" {
-		app.notFound(w)
+	//if session == "" {
+	//	app.notFound(w)
+	//	return
+	//}
+
+	//pollId := app.sessionManager.GetString(r.Context(), "PollId")
+
+	poll, err := app.models.Polls.Get(session)
+	if err != nil {
+		app.clientError(w, http.StatusNotFound)
 		return
 	}
 
-	pollId := app.sessionManager.GetString(r.Context(), "PollId")
-	title, _ := app.cacheManager.Get("PollTitle")
-
-	if session == pollId {
-		templates.JoinSession(interfaceToString(session), interfaceToString(title)).Render(r.Context(), w)
+	if session == session {
+		templates.JoinSession(interfaceToString(poll.PollSession), interfaceToString(poll.Title)).Render(r.Context(), w)
 		return
 	}
 
@@ -31,22 +38,6 @@ func (app *application) joinSession(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) createPollPOST(w http.ResponseWriter, r *http.Request) {
-	//err := r.ParseForm()
-	//if err != nil {
-	//	app.clientError(w, http.StatusBadRequest)
-	//	return
-	//}
-	//
-	//var form createPollForm
-	//
-	//// decode the values retrieved from form in POST request into createPollForm
-	//err = app.decodePostForm(r, &form)
-	//if err != nil {
-	//	app.clientError(w, http.StatusBadRequest)
-	//	return
-	//}
-	//
-
 	sessionId := app.generateUniqueSessionId()
 
 	app.sessionManager.Put(r.Context(), "PollId", sessionId)
@@ -75,6 +66,19 @@ func (app *application) createPollPOSTWithSession(w http.ResponseWriter, r *http
 	err = app.decodePostForm(r, &form)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
+		return
+	}
+
+	poll := &data.Poll{
+		PollSession: pollId,
+		Title:       form.Title,
+		Answers:     form.Questions,
+		ExpiresAt:   time.Now().Add(time.Minute * 60),
+	}
+
+	err = app.models.Polls.Insert(poll)
+	if err != nil {
+		app.clientError(w, http.StatusInternalServerError)
 		return
 	}
 

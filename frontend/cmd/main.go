@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/alexedwards/scs/pgxstore"
 	"github.com/alexedwards/scs/v2"
+	"github.com/emildel/gopoll/frontend/internal/data"
 	"github.com/go-playground/form/v4"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/patrickmn/go-cache"
@@ -35,6 +36,7 @@ type application struct {
 	formDecoder    *form.Decoder
 	sessionManager *scs.SessionManager
 	cacheManager   *cache.Cache
+	models         data.Models
 }
 
 func main() {
@@ -72,6 +74,7 @@ func main() {
 		formDecoder:    formDecoder,
 		sessionManager: scs.New(),
 		cacheManager:   cache.New(5*time.Minute, 10*time.Minute),
+		models:         data.NewModel(dbpool),
 	}
 
 	app.sessionManager.Store = pgxstore.New(dbpool)
