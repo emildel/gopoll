@@ -38,7 +38,7 @@ func CreateSession() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h1><div class=\"mx-auto overflow-hidden align-middle px-4 min-[601px]:text-center bg-[#FCFDFC]\"><form action=\"/createPoll\" method=\"post\"><div id=\"formInputs\" class=\"mx-auto w-full pr-16 p-5 mt-5 min-[601px]:mt-10 min-[601px]:py-10 min-[601px]:pl-0 max-w-[900px] h-[27rem] overflow-y-auto overscroll-auto min-[601px]:overscroll:contain scrollbar-gutter-stable shadow-lg shadow-slate-200 rounded\"><label for=\"title\" class=\"text-xl float-left w-full min-[601px]:w-1/5\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h1><div class=\"overflow-hidden px-4 min-[601px]:text-center bg-[#FCFDFC]\"><form action=\"/createPoll\" method=\"post\"><div id=\"formInputs\" class=\"mx-auto w-full pr-16 p-5 mt-5 min-[601px]:mt-10 min-[601px]:py-10 min-[601px]:pl-0 max-w-[900px] h-[27rem] overflow-y-auto overscroll-auto min-[601px]:overscroll:contain scrollbar-gutter-stable shadow-lg shadow-slate-200 rounded\"><label for=\"title\" class=\"text-xl float-left w-full min-[601px]:w-1/5\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -65,7 +65,7 @@ func CreateSession() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</label> <input type=\"text\" id=\"inputAnswer2\" name=\"inputAnswer\" placeholder=\"Answer\" class=\"w-full min-[601px]:w-4/5 min-[601px]:mt-4 p-5 border rounded-sm border-solid border-gray-400\"><br></div><div class=\"mx-auto flex flex-col gap-4 my-10 max-w-[900px]\"><button id=\"addPollAnswerBtn\" type=\"button\" class=\"max-w-[300px] text-[#809D80] py-5 duration-300 cursor-pointer border-2 border-[#809D80] hover:underline rounded\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</label> <input type=\"text\" id=\"inputAnswer2\" name=\"inputAnswer\" placeholder=\"Answer\" class=\"w-full min-[601px]:w-4/5 min-[601px]:mt-4 p-5 border rounded-sm border-solid border-gray-400\"><br><div id=\"appendAnswersDiv\"></div></div><div class=\"mx-auto my-10 max-w-[900px]\"><div class=\"flex gap-4 justify-between\"><button id=\"addPollAnswerBtn\" type=\"button\" class=\"w-full max-w-[300px] text-[#809D80] py-5 duration-300 cursor-pointer border-2 border-[#809D80] hover:underline rounded\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -74,21 +74,32 @@ func CreateSession() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</button> <input type=\"submit\" value=\"Create poll\" class=\"max-w-[300px] whitespace-normal bg-[#809D80] text-zinc-50 py-5 px-5 duration-300 cursor-pointer border-2 border-slate-950 hover:bg-[#5c735c] hover:text-white rounded\"></div></form></div><script>")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</button> <button id=\"deletePollAnswerBtn\" type=\"button\" class=\"w-full max-w-[300px] text-[#d65a6d] py-5 duration-300 cursor-pointer border-2 border-[#d65a6d] hover:underline rounded\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Var8 := `
+			templ_7745c5c3_Var8 := `Delete answer`
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</button></div><div class=\"flex mt-4 justify-between\"><input type=\"submit\" value=\"Create poll\" class=\"w-full mr-4 max-w-[300px] whitespace-normal bg-[#809D80] text-zinc-50 py-5 duration-300 cursor-pointer border-2 border-slate-950 hover:bg-[#5c735c] hover:text-white rounded\"><div class=\"w-full max-w-[300px] border-2 border-transparent\"></div></div></div></form></div><script>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Var9 := `
             (function() {
                 var counter = 2;
-                var btn = document.getElementById('addPollAnswerBtn')
+                var addAnswerBtn = document.getElementById('addPollAnswerBtn')
+                var deleteAnswerBtn = document.getElementById('deletePollAnswerBtn')
+                var appendAnswersDiv = document.getElementById('appendAnswersDiv')
                 var form = document.getElementById('formInputs')
 
                 var addInput = function() {
                     counter++;
                     var label = document.createElement("label");
                     var input = document.createElement("input");
-                    var br = document.createElement('br');
+                    var div = document.createElement("div")
                     label.htmlFor = 'inputAnswer' + counter;
                     label.className = 'text-xl float-left w-full mt-4 min-[601px]:w-1/5'
                     label.innerHTML = 'Answer'
@@ -98,19 +109,25 @@ func CreateSession() templ.Component {
                     input.name = 'inputAnswer';
                     input.placeholder = 'Answer'
                     input.className = 'w-full min-[601px]:w-4/5 min-[601px]:mt-4 p-5 border rounded-sm border-solid border-gray-400';
-                    form.appendChild(label);
-                    form.appendChild(input);
-                    form.appendChild(br);
+                    div.appendChild(label);
+                    div.appendChild(input)
+                    appendAnswersDiv.appendChild(div);
                 };
 
-                btn.addEventListener('click', function() {
+                addAnswerBtn.addEventListener('click', function() {
                     addInput();
                     form.scrollTo({ top: form.scrollHeight, behavior: 'smooth' });
                 }.bind(this));
+
+                deleteAnswerBtn.addEventListener('click', function () {
+                    if(appendAnswersDiv.hasChildNodes()) {
+                        appendAnswersDiv.removeChild(appendAnswersDiv.lastChild)
+                    }
+                });
             })();
 
         `
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var8)
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var9)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
