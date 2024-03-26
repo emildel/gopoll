@@ -1,36 +1,32 @@
 package templates
 
-templ PollCreator(title string, questions []string) {
+templ CreatorChartView(title string, answers []string) {
+    <body onload={ loadChart(answers) }>
+        <h1 class="flex justify-center text-center px-5 pt-14 pb-10 min-[601px]:pt-28 min-[601px]:pb-20 text-3xl font-extrabold underline">{ title }</h1>
 
-    @Head("GoPoll | Your Poll") {
-        <body onload={ loadChart(questions) }>
-
-            <h1 class="flex justify-center text-center px-5 pt-14 pb-10 min-[601px]:pt-28 min-[601px]:pb-20 text-3xl font-extrabold underline">{ title }</h1>
-
-            <!--        <h1>Answers:</h1>-->
-            <!--        for _, item := range questions {-->
-            <!--            <p> { item } </p>-->
-            <!--        }-->
-
-            <div class="bg-[#FCFDFC] p-4">
-                <div class="flex justify-center items-center relative m-auto h-[50vh] max-w-[1200px] px-2 min-[601px]:px-4 shadow-lg shadow-slate-200 rounded">
-                    <canvas id="myChart1" class=""></canvas>
-                </div>
+        <div class="bg-[#FCFDFC] p-4">
+            <div class="flex justify-center items-center relative m-auto h-[50vh] max-w-[1200px] px-2 min-[601px]:px-4 shadow-lg shadow-slate-200 rounded">
+                <canvas id="myChart1" class=""></canvas>
             </div>
-        </body>
+        </div>
+    </body>
+}
+
+templ PollCreator(title string, answers []string) {
+    @Head("GoPoll | Your Poll") {
+        @CreatorChartView(title, answers)
     }
 }
 
-script loadChart(questions []string) {
+script loadChart(answers []string) {
 
     var fontSize = 12;
     if(window.innerWidth > 600) {
         fontSize = 16;
     }
 
-    console.log(questions);
     var data = {
-        labels: questions,
+        labels: answers,
         datasets: [{
             label: '# of Votes',
             borderWidth: 1

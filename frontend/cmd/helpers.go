@@ -2,19 +2,10 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"github.com/go-playground/form/v4"
 	"math/rand"
 	"net/http"
 )
-
-type contextKey string
-
-const sessionIdCtx = contextKey("X-SessionID")
-
-func interfaceToString(input interface{}) string {
-	return fmt.Sprintf("%v", input)
-}
 
 func (app *application) decodePostForm(r *http.Request, dst any) error {
 	err := r.ParseForm()

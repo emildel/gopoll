@@ -40,5 +40,7 @@ func (app *application) routes() http.Handler {
 	router.Handler(http.MethodPost, "/createPoll/:sessionId", dynamic.ThenFunc(app.createPollPOSTWithSession))
 	router.Handler(http.MethodGet, "/createPoll/:sessionId", dynamic.ThenFunc(app.createPollPOSTWithSession))
 
+	router.HandlerFunc(http.MethodPost, "/answerPoll", app.answerPoll)
+
 	return router
 }

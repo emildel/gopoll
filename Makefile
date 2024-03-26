@@ -9,10 +9,10 @@ migrateNew:
 	@echo 'Creating migration files for ${name}...'
 	migrate create -seq -ext=.sql -dir=./migrations ${name}
 
-.PHONE: migrateUp
+.PHONY: migrateUp
 migrateUp:
 	@migrate -path=./migrations/ -database=${GOPOLL_DB_DSN}'?sslmode=disable' up
 
-.PHONE: migrateDown
+.PHONY: migrateDown
 migrateDown:
 	@migrate -path=./migrations/ -database=${GOPOLL_DB_DSN}'?sslmode=disable' down

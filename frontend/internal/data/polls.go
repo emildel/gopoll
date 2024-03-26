@@ -12,27 +12,30 @@ type Poll struct {
 	PollSession string
 	Title       string
 	Answers     []string
+	Results     []int
 	ExpiresAt   time.Time
 }
 
 type PollModelInterface interface {
 	Insert(poll *Poll) error
 	Get(pollId string) (*Poll, error)
+	Update(pollAnswer int, pollId string) error
 }
 
 type PollModel struct {
 	DB *pgxpool.Pool
 }
 
+// Insert a new Poll to the database
 func (p *PollModel) Insert(poll *Poll) error {
 	query := `
-		INSERT INTO poll (pollSession, title, answers, expires_at)
-		VALUES ($1, $2, $3, $4)
+		INSERT INTO poll (pollSession, title, answers, results, expires_at)
+		VALUES ($1, $2, $3, $4, $5)
 		`
 
-	args := []any{poll.PollSession, poll.Title, poll.Answers, poll.ExpiresAt}
+	args := []any{poll.PollSession, poll.Title, poll.Answers, poll.Results, poll.ExpiresAt}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
 	if _, err := p.DB.Exec(ctx, query, args...); err != nil {
@@ -42,6 +45,7 @@ func (p *PollModel) Insert(poll *Poll) error {
 	return nil
 }
 
+// Get a Poll by poll id.
 func (p *PollModel) Get(pollId string) (*Poll, error) {
 	query := `
 		SELECT pollSession, title, answers, expires_at
@@ -51,7 +55,7 @@ func (p *PollModel) Get(pollId string) (*Poll, error) {
 
 	var poll Poll
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
 	err := p.DB.QueryRow(ctx, query, pollId).Scan(
@@ -71,4 +75,21 @@ func (p *PollModel) Get(pollId string) (*Poll, error) {
 	}
 
 	return &poll, nil
+}
+
+func (p *PollModel) Update(pollAnswer int, pollId string) error {
+	query := `
+		UPDATE poll
+		SET results[$1] = results[$1] + 1
+		WHERE pollSession = $2
+		`
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	if _, err := p.DB.Exec(ctx, query, pollAnswer, pollId); err != nil {
+		return err
+	}
+
+	return nil
 }
