@@ -548,14 +548,6 @@ video {
   position: relative;
 }
 
-.col-span-1 {
-  grid-column: span 1 / span 1;
-}
-
-.float-right {
-  float: right;
-}
-
 .float-left {
   float: left;
 }
@@ -586,6 +578,10 @@ video {
   margin-bottom: 1.5rem;
 }
 
+.mr-4 {
+  margin-right: 1rem;
+}
+
 .mt-20 {
   margin-top: 5rem;
 }
@@ -602,28 +598,8 @@ video {
   margin-top: 1.5rem;
 }
 
-.mt-0 {
-  margin-top: 0px;
-}
-
-.mr-0 {
-  margin-right: 0px;
-}
-
-.mr-4 {
-  margin-right: 1rem;
-}
-
-.ml-4 {
-  margin-left: 1rem;
-}
-
 .flex {
   display: flex;
-}
-
-.grid {
-  display: grid;
 }
 
 .h-\[27rem\] {
@@ -641,14 +617,6 @@ video {
 
 .w-full {
   width: 100%;
-}
-
-.w-1\/2 {
-  width: 50%;
-}
-
-.min-w-\[300px\] {
-  min-width: 300px;
 }
 
 .max-w-\[1200px\] {
@@ -671,22 +639,6 @@ video {
   cursor: pointer;
 }
 
-.grid-flow-col {
-  grid-auto-flow: column;
-}
-
-.grid-cols-2 {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.grid-rows-2 {
-  grid-template-rows: repeat(2, minmax(0, 1fr));
-}
-
-.flex-row {
-  flex-direction: row;
-}
-
 .flex-col {
   flex-direction: column;
 }
@@ -695,24 +647,8 @@ video {
   flex-wrap: wrap;
 }
 
-.place-items-end {
-  place-items: end;
-}
-
-.content-end {
-  align-content: flex-end;
-}
-
-.content-between {
-  align-content: space-between;
-}
-
 .items-center {
   align-items: center;
-}
-
-.items-stretch {
-  align-items: stretch;
 }
 
 .justify-center {
@@ -725,33 +661,6 @@ video {
 
 .gap-4 {
   gap: 1rem;
-}
-
-.gap-y-10 {
-  row-gap: 2.5rem;
-}
-
-.gap-y-20 {
-  row-gap: 5rem;
-}
-
-.gap-x-20 {
-  -moz-column-gap: 5rem;
-       column-gap: 5rem;
-}
-
-.gap-x-48 {
-  -moz-column-gap: 12rem;
-       column-gap: 12rem;
-}
-
-.gap-x-56 {
-  -moz-column-gap: 14rem;
-       column-gap: 14rem;
-}
-
-.justify-self-end {
-  justify-self: end;
 }
 
 .overflow-hidden {
@@ -803,6 +712,11 @@ video {
   border-color: rgb(128 157 128 / var(--tw-border-opacity));
 }
 
+.border-\[\#d65a6d\] {
+  --tw-border-opacity: 1;
+  border-color: rgb(214 90 109 / var(--tw-border-opacity));
+}
+
 .border-gray-400 {
   --tw-border-opacity: 1;
   border-color: rgb(156 163 175 / var(--tw-border-opacity));
@@ -815,16 +729,6 @@ video {
 
 .border-transparent {
   border-color: transparent;
-}
-
-.border-\[\#d64057\] {
-  --tw-border-opacity: 1;
-  border-color: rgb(214 64 87 / var(--tw-border-opacity));
-}
-
-.border-\[\#d65a6d\] {
-  --tw-border-opacity: 1;
-  border-color: rgb(214 90 109 / var(--tw-border-opacity));
 }
 
 .bg-\[\#809D80\] {
@@ -845,21 +749,6 @@ video {
 .bg-slate-50 {
   --tw-bg-opacity: 1;
   background-color: rgb(248 250 252 / var(--tw-bg-opacity));
-}
-
-.bg-blue-400 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(96 165 250 / var(--tw-bg-opacity));
-}
-
-.bg-red-300 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(252 165 165 / var(--tw-bg-opacity));
-}
-
-.bg-green-400 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(74 222 128 / var(--tw-bg-opacity));
 }
 
 .p-4 {
@@ -919,14 +808,6 @@ video {
   padding-top: 7rem;
 }
 
-.pl-0 {
-  padding-left: 0px;
-}
-
-.pt-4 {
-  padding-top: 1rem;
-}
-
 .text-center {
   text-align: center;
 }
@@ -972,6 +853,11 @@ video {
   color: rgb(128 157 128 / var(--tw-text-opacity));
 }
 
+.text-\[\#d65a6d\] {
+  --tw-text-opacity: 1;
+  color: rgb(214 90 109 / var(--tw-text-opacity));
+}
+
 .text-neutral-950 {
   --tw-text-opacity: 1;
   color: rgb(10 10 10 / var(--tw-text-opacity));
@@ -980,16 +866,6 @@ video {
 .text-zinc-50 {
   --tw-text-opacity: 1;
   color: rgb(250 250 250 / var(--tw-text-opacity));
-}
-
-.text-\[\#d64057\] {
-  --tw-text-opacity: 1;
-  color: rgb(214 64 87 / var(--tw-text-opacity));
-}
-
-.text-\[\#d65a6d\] {
-  --tw-text-opacity: 1;
-  color: rgb(214 90 109 / var(--tw-text-opacity));
 }
 
 .underline {
@@ -1051,19 +927,6 @@ video {
     width: 80%;
   }
 
-  .min-\[601px\]\:w-fit {
-    width: -moz-fit-content;
-    width: fit-content;
-  }
-
-  .min-\[601px\]\:w-\[95\%\] {
-    width: 95%;
-  }
-
-  .min-\[601px\]\:min-w-\[300px\] {
-    min-width: 300px;
-  }
-
   .min-\[601px\]\:px-4 {
     padding-left: 1rem;
     padding-right: 1rem;
@@ -1088,12 +951,6 @@ video {
 
   .min-\[601px\]\:text-center {
     text-align: center;
-  }
-}
-
-@media (min-width: 633px) {
-  .min-\[633px\]\:min-w-\[300px\] {
-    min-width: 300px;
   }
 }
 
