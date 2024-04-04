@@ -10,7 +10,7 @@ import "context"
 import "io"
 import "bytes"
 
-func CreatorChartView(title string, answers []string) templ.Component {
+func CreatorChartView(title string, answers []string, pollId string) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -23,7 +23,7 @@ func CreatorChartView(title string, answers []string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templ.RenderScriptItems(ctx, templ_7745c5c3_Buffer, loadChart(answers))
+		templ_7745c5c3_Err = templ.RenderScriptItems(ctx, templ_7745c5c3_Buffer, loadChart(answers, pollId))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -31,7 +31,7 @@ func CreatorChartView(title string, answers []string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var2 templ.ComponentScript = loadChart(answers)
+		var templ_7745c5c3_Var2 templ.ComponentScript = loadChart(answers, pollId)
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var2.Call)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -45,7 +45,7 @@ func CreatorChartView(title string, answers []string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h1><div class=\"bg-[#FCFDFC] p-4\"><div class=\"flex justify-center items-center relative m-auto h-[50vh] max-w-[1200px] px-2 min-[601px]:px-4 shadow-lg shadow-slate-200 rounded\"><canvas id=\"myChart1\" class=\"\"></canvas></div></div></body>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h1><div class=\"bg-[#FCFDFC] p-4\"><div class=\"flex justify-center items-center relative m-auto h-[50vh] max-w-[1200px] px-2 min-[601px]:px-4 shadow-lg shadow-slate-200 rounded\"><canvas id=\"myChart1\"></canvas></div></div></body>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -56,7 +56,7 @@ func CreatorChartView(title string, answers []string) templ.Component {
 	})
 }
 
-func PollCreator(title string, answers []string) templ.Component {
+func PollCreator(title string, answers []string, pollId string) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -75,7 +75,7 @@ func PollCreator(title string, answers []string) templ.Component {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
 				defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 			}
-			templ_7745c5c3_Err = CreatorChartView(title, answers).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = CreatorChartView(title, answers, pollId).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -95,10 +95,10 @@ func PollCreator(title string, answers []string) templ.Component {
 	})
 }
 
-func loadChart(answers []string) templ.ComponentScript {
+func loadChart(answers []string, pollId string) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_loadChart_bf12`,
-		Function: `function __templ_loadChart_bf12(answers){var fontSize = 12;
+		Name: `__templ_loadChart_a1db`,
+		Function: `function __templ_loadChart_a1db(answers, pollId){var fontSize = 12;
     if(window.innerWidth > 600) {
         fontSize = 16;
     }
@@ -127,12 +127,31 @@ func loadChart(answers []string) templ.ComponentScript {
 
     Chart.defaults.font.size = fontSize;
 
-    new Chart("myChart1", {
+    var myChart = new Chart("myChart1", {
         type: 'bar',
         data: data,
         options: options
-    });}`,
-		Call:       templ.SafeScript(`__templ_loadChart_bf12`, answers),
-		CallInline: templ.SafeScriptInline(`__templ_loadChart_bf12`, answers),
+    });
+
+    async function subscribe(pollId) {
+        let endpoint = "updateChart/" + pollId;
+
+        let response = await fetch(endpoint);
+
+        if (response.status == 502) {
+            await subscribe(pollId);
+        } else if (response.status != 200) {
+            console.log(response.status);
+
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await subscribe(pollId);
+        } else {
+            await subscribe(pollId);
+        }
+    }
+
+    subscribe(pollId);}`,
+		Call:       templ.SafeScript(`__templ_loadChart_a1db`, answers, pollId),
+		CallInline: templ.SafeScriptInline(`__templ_loadChart_a1db`, answers, pollId),
 	}
 }

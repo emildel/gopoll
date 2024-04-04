@@ -1,24 +1,24 @@
 package templates
 
-templ CreatorChartView(title string, answers []string) {
-    <body onload={ loadChart(answers) }>
+templ CreatorChartView(title string, answers []string, pollId string) {
+    <body onload={ loadChart(answers, pollId) }>
         <h1 class="flex justify-center text-center px-5 pt-14 pb-10 min-[601px]:pt-28 min-[601px]:pb-20 text-3xl font-extrabold underline">{ title }</h1>
 
         <div class="bg-[#FCFDFC] p-4">
             <div class="flex justify-center items-center relative m-auto h-[50vh] max-w-[1200px] px-2 min-[601px]:px-4 shadow-lg shadow-slate-200 rounded">
-                <canvas id="myChart1" class=""></canvas>
+                <canvas id="myChart1"></canvas>
             </div>
         </div>
     </body>
 }
 
-templ PollCreator(title string, answers []string) {
+templ PollCreator(title string, answers []string, pollId string) {
     @Head("GoPoll | Your Poll") {
-        @CreatorChartView(title, answers)
+        @CreatorChartView(title, answers, pollId)
     }
 }
 
-script loadChart(answers []string) {
+script loadChart(answers []string, pollId string) {
 
     var fontSize = 12;
     if(window.innerWidth > 600) {
@@ -49,9 +49,28 @@ script loadChart(answers []string) {
 
     Chart.defaults.font.size = fontSize;
 
-    new Chart("myChart1", {
+    var myChart = new Chart("myChart1", {
         type: 'bar',
         data: data,
         options: options
     });
+
+    async function subscribe(pollId) {
+        let endpoint = "updateChart/" + pollId;
+
+        let response = await fetch(endpoint);
+
+        if (response.status == 502) {
+            await subscribe(pollId);
+        } else if (response.status != 200) {
+            console.log(response.status);
+
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await subscribe(pollId);
+        } else {
+            await subscribe(pollId);
+        }
+    }
+
+    subscribe(pollId);
 }

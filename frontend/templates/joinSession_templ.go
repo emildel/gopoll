@@ -12,7 +12,7 @@ import "bytes"
 
 import "strconv"
 
-func JoinSession(title string, answers []string, isCreator bool) templ.Component {
+func JoinSession(title string, answers []string, pollId string, isCreator bool) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -32,7 +32,7 @@ func JoinSession(title string, answers []string, isCreator bool) templ.Component
 				defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 			}
 			if isCreator {
-				templ_7745c5c3_Err = CreatorChartView(title, answers).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = CreatorChartView(title, answers, pollId).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

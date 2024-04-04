@@ -37,6 +37,7 @@ type application struct {
 	sessionManager *scs.SessionManager
 	cacheManager   *cache.Cache
 	models         data.Models
+	sessionChannel SessionChannel
 }
 
 func main() {
@@ -75,6 +76,7 @@ func main() {
 		sessionManager: scs.New(),
 		cacheManager:   cache.New(5*time.Minute, 10*time.Minute),
 		models:         data.NewModel(dbpool),
+		sessionChannel: make(chan string),
 	}
 
 	app.sessionManager.Store = pgxstore.New(dbpool)

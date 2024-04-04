@@ -48,7 +48,7 @@ func (p *PollModel) Insert(poll *Poll) error {
 // Get a Poll by poll id.
 func (p *PollModel) Get(pollId string) (*Poll, error) {
 	query := `
-		SELECT pollSession, title, answers, expires_at
+		SELECT pollSession, title, answers, results, expires_at
 		FROM poll
 		WHERE pollSession = $1
 		`
@@ -62,6 +62,7 @@ func (p *PollModel) Get(pollId string) (*Poll, error) {
 		&poll.PollSession,
 		&poll.Title,
 		&poll.Answers,
+		&poll.Results,
 		&poll.ExpiresAt,
 	)
 

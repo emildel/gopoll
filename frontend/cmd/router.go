@@ -42,5 +42,7 @@ func (app *application) routes() http.Handler {
 
 	router.HandlerFunc(http.MethodPost, "/answerPoll", app.answerPoll)
 
+	router.Handler(http.MethodGet, "/updateChart/:sessionId", dynamic.ThenFunc(app.updateChart))
+
 	return router
 }

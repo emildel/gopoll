@@ -1,10 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/emildel/gopoll/frontend/internal/data"
 	"github.com/emildel/gopoll/frontend/templates"
-	"github.com/patrickmn/go-cache"
 	"net/http"
 	"strings"
 	"time"
@@ -25,11 +25,11 @@ func (app *application) joinSession(w http.ResponseWriter, r *http.Request) {
 
 	sessionExists := app.sessionManager.GetString(r.Context(), fmt.Sprintf("PollId%s", session))
 	if sessionExists != "" {
-		templates.JoinSession(poll.Title, poll.Answers, true).Render(r.Context(), w)
+		templates.JoinSession(poll.Title, poll.Answers, session, true).Render(r.Context(), w)
 		return
 	}
 
-	templates.JoinSession(poll.Title, poll.Answers, false).Render(r.Context(), w)
+	templates.JoinSession(poll.Title, poll.Answers, session, false).Render(r.Context(), w)
 
 }
 
@@ -80,10 +80,9 @@ func (app *application) createPollPOSTWithSession(w http.ResponseWriter, r *http
 		return
 	}
 
-	app.cacheManager.Set("PollId", pollId, cache.DefaultExpiration)
-	app.cacheManager.Set("PollTitle", form.Title, cache.DefaultExpiration)
+	app.sessionChannel.createChannel(pollId)
 
-	templates.PollCreator(form.Title, form.Questions).Render(r.Context(), w)
+	templates.PollCreator(form.Title, form.Questions, pollId).Render(r.Context(), w)
 }
 
 func (app *application) answerPoll(w http.ResponseWriter, r *http.Request) {
@@ -105,5 +104,47 @@ func (app *application) answerPoll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	app.sessionChannel.sendMessage(pollId, "Update")
+
+	//go func() { app.notifierChannel <- "Update" }()
+
 	templates.AnswerSubmitted().Render(r.Context(), w)
+}
+
+// Gets called by Client to update the chart. Function is blocked until app.notifierChannel
+// receives an update. Once a new update is received, calls the database to get the updated results.
+// app.notifierChannel is written to in the answerPoll() handler.
+func (app *application) updateChart(w http.ResponseWriter, r *http.Request) {
+
+	pollSessionFromUri := strings.Split(r.RequestURI, "/")[2]
+	pollId := app.sessionManager.GetString(r.Context(), fmt.Sprintf("PollId%s", pollSessionFromUri))
+
+	if pollId == "" {
+		app.clientError(w, http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Block until channel receives an update
+	app.sessionChannel.waitOnChannel(pollId)
+
+	poll, err := app.models.Polls.Get(pollId)
+	if err != nil {
+		app.clientError(w, http.StatusNotFound)
+		return
+	}
+
+	jsonData := map[string]interface{}{
+		"answers": poll.Answers,
+		"results": poll.Results,
+	}
+
+	js, err := json.Marshal(jsonData)
+	if err != nil {
+		app.clientError(w, http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	w.Write(js)
 }
