@@ -5,25 +5,37 @@ import (
 	"sync"
 )
 
-type SessionChannel chan string
-
-var channels = map[string]SessionChannel{}
-var mutex = sync.Mutex{}
-
-func (SessionChannel) createChannel(pollId string) {
-	mutex.Lock()
-	defer mutex.Unlock()
-
-	channel := make(SessionChannel)
-	channels[pollId] = channel
-	//return channel
+type ChannelManager struct {
+	ChannelSlice map[string]chan string
 }
 
-func (SessionChannel) sendMessage(pollId, message string) {
+// var channels = map[string]ChannelManager{}
+var mutex = sync.Mutex{}
+
+func NewChannelManager() *ChannelManager {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	channel, ok := channels[pollId]
+	c := &ChannelManager{
+		ChannelSlice: make(map[string]chan string),
+	}
+
+	return c
+}
+
+func (c *ChannelManager) createChannel(pollId string) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	channel := make(chan string)
+	c.ChannelSlice[pollId] = channel
+}
+
+func (c *ChannelManager) sendMessage(pollId, message string) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	channel, ok := c.ChannelSlice[pollId]
 	if ok {
 		channel <- message
 	} else {
@@ -31,9 +43,9 @@ func (SessionChannel) sendMessage(pollId, message string) {
 	}
 }
 
-func (SessionChannel) waitOnChannel(pollId string) {
+func (c *ChannelManager) waitOnChannel(pollId string) {
 
-	channel, ok := channels[pollId]
+	channel, ok := c.ChannelSlice[pollId]
 	if !ok {
 		fmt.Println("Cannot wait on channel since not found")
 	}
@@ -48,9 +60,9 @@ loop:
 	}
 }
 
-func (SessionChannel) closeChannel(pollId string) {
+func (c *ChannelManager) closeChannel(pollId string) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	delete(channels, pollId)
+	delete(c.ChannelSlice, pollId)
 }

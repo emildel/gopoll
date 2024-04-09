@@ -20,6 +20,37 @@ templ PollCreator(title string, answers []string, pollId string) {
 
 script loadChart(answers []string, pollId string) {
 
+    async function subscribe(pollId) {
+        const endpoint = "updateChart/" + pollId;
+
+        const response = await fetch(endpoint, {
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        if (response.status != 200) {
+            console.log(response.status);
+
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await subscribe(pollId);
+
+        } else {
+            const results = await response.json();
+
+            const scores = results.pollResults.results.map(function(index) {
+                return index;
+            });
+
+            myChart.data.datasets[0].data = scores;
+            myChart.update();
+
+            await subscribe(pollId);
+        };
+    };
+
+    subscribe(pollId);
+
     var fontSize = 12;
     if(window.innerWidth > 600) {
         fontSize = 16;
@@ -54,23 +85,4 @@ script loadChart(answers []string, pollId string) {
         data: data,
         options: options
     });
-
-    async function subscribe(pollId) {
-        let endpoint = "updateChart/" + pollId;
-
-        let response = await fetch(endpoint);
-
-        if (response.status == 502) {
-            await subscribe(pollId);
-        } else if (response.status != 200) {
-            console.log(response.status);
-
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            await subscribe(pollId);
-        } else {
-            await subscribe(pollId);
-        }
-    }
-
-    subscribe(pollId);
 }

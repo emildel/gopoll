@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/emildel/gopoll/frontend/internal/data"
 	"github.com/emildel/gopoll/frontend/templates"
@@ -138,13 +137,9 @@ func (app *application) updateChart(w http.ResponseWriter, r *http.Request) {
 		"results": poll.Results,
 	}
 
-	js, err := json.Marshal(jsonData)
+	err = app.writeJSON(w, http.StatusOK, envelope{"pollResults": jsonData}, nil)
 	if err != nil {
-		app.clientError(w, http.StatusInternalServerError)
+		app.serverErrorResponse(w, r, err)
 		return
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-
-	w.Write(js)
 }

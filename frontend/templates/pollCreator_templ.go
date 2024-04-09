@@ -97,8 +97,39 @@ func PollCreator(title string, answers []string, pollId string) templ.Component 
 
 func loadChart(answers []string, pollId string) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_loadChart_a1db`,
-		Function: `function __templ_loadChart_a1db(answers, pollId){var fontSize = 12;
+		Name: `__templ_loadChart_90a1`,
+		Function: `function __templ_loadChart_90a1(answers, pollId){async function subscribe(pollId) {
+        const endpoint = "updateChart/" + pollId;
+
+        const response = await fetch(endpoint, {
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        if (response.status != 200) {
+            console.log(response.status);
+
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await subscribe(pollId);
+
+        } else {
+            const results = await response.json();
+
+            const scores = results.pollResults.results.map(function(index) {
+                return index;
+            });
+
+            myChart.data.datasets[0].data = scores;
+            myChart.update();
+
+            await subscribe(pollId);
+        };
+    };
+
+    subscribe(pollId);
+
+    var fontSize = 12;
     if(window.innerWidth > 600) {
         fontSize = 16;
     }
@@ -131,27 +162,8 @@ func loadChart(answers []string, pollId string) templ.ComponentScript {
         type: 'bar',
         data: data,
         options: options
-    });
-
-    async function subscribe(pollId) {
-        let endpoint = "updateChart/" + pollId;
-
-        let response = await fetch(endpoint);
-
-        if (response.status == 502) {
-            await subscribe(pollId);
-        } else if (response.status != 200) {
-            console.log(response.status);
-
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            await subscribe(pollId);
-        } else {
-            await subscribe(pollId);
-        }
-    }
-
-    subscribe(pollId);}`,
-		Call:       templ.SafeScript(`__templ_loadChart_a1db`, answers, pollId),
-		CallInline: templ.SafeScriptInline(`__templ_loadChart_a1db`, answers, pollId),
+    });}`,
+		Call:       templ.SafeScript(`__templ_loadChart_90a1`, answers, pollId),
+		CallInline: templ.SafeScriptInline(`__templ_loadChart_90a1`, answers, pollId),
 	}
 }

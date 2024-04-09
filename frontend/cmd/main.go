@@ -9,7 +9,6 @@ import (
 	"github.com/emildel/gopoll/frontend/internal/data"
 	"github.com/go-playground/form/v4"
 	"github.com/jackc/pgx/v5/pgxpool"
-	"github.com/patrickmn/go-cache"
 	"log/slog"
 	"net/http"
 	"os"
@@ -35,9 +34,8 @@ type application struct {
 	logger         *slog.Logger
 	formDecoder    *form.Decoder
 	sessionManager *scs.SessionManager
-	cacheManager   *cache.Cache
 	models         data.Models
-	sessionChannel SessionChannel
+	sessionChannel *ChannelManager
 }
 
 func main() {
@@ -69,14 +67,15 @@ func main() {
 
 	formDecoder := form.NewDecoder()
 
+	channelManager := NewChannelManager()
+
 	app := &application{
 		config:         cfg,
 		logger:         logger,
 		formDecoder:    formDecoder,
 		sessionManager: scs.New(),
-		cacheManager:   cache.New(5*time.Minute, 10*time.Minute),
 		models:         data.NewModel(dbpool),
-		sessionChannel: make(chan string),
+		sessionChannel: channelManager,
 	}
 
 	app.sessionManager.Store = pgxstore.New(dbpool)
