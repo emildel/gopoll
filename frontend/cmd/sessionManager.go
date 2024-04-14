@@ -1,68 +1,102 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"sync"
 )
 
 type ChannelManager struct {
-	ChannelSlice map[string]chan string
+	mu           sync.Mutex
+	ChannelSlice map[string]*Poll
 }
 
-// var channels = map[string]ChannelManager{}
-var mutex = sync.Mutex{}
+type Poll struct { // Manager subscription was created from
+	channel chan string
+	id      string
+	once    sync.Once // ensures we can only close channel c once
+}
 
 func NewChannelManager() *ChannelManager {
-	mutex.Lock()
-	defer mutex.Unlock()
+	return &ChannelManager{
+		ChannelSlice: make(map[string]*Poll),
+	}
+}
 
-	c := &ChannelManager{
-		ChannelSlice: make(map[string]chan string),
+func (c *ChannelManager) CreateSubscription(pollId string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	sub := &Poll{
+		// Channel of size 1, as long as there is a value still in the channel,
+		// there is updating to be done by the client.
+		channel: make(chan string, 1),
+		id:      pollId,
+		once:    sync.Once{},
 	}
 
-	return c
+	c.ChannelSlice[pollId] = sub
 }
 
-func (c *ChannelManager) createChannel(pollId string) {
-	mutex.Lock()
-	defer mutex.Unlock()
+func (c *ChannelManager) SendMessage(pollId, message string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 
-	channel := make(chan string)
-	c.ChannelSlice[pollId] = channel
-}
-
-func (c *ChannelManager) sendMessage(pollId, message string) {
-	mutex.Lock()
-	defer mutex.Unlock()
-
-	channel, ok := c.ChannelSlice[pollId]
-	if ok {
-		channel <- message
-	} else {
+	session, ok := c.ChannelSlice[pollId]
+	if !ok {
 		fmt.Println("Session not found for channel")
+		return
+	}
+
+	select {
+	// If channel is not full (i.e. empty in our case), send a message to signal we should do an update
+	case session.channel <- message:
+		// If the channel is full, we can just return since we're using the channel as a
+		// signal for the client to do an update to the database, and a "signal" is
+		// already there
+	default:
+		return
 	}
 }
 
-func (c *ChannelManager) waitOnChannel(pollId string) {
+func (c *ChannelManager) WaitOnChannel(pollId string) error {
 
 	channel, ok := c.ChannelSlice[pollId]
 	if !ok {
-		fmt.Println("Cannot wait on channel since not found")
+		return ErrChannelNotFound
 	}
 
-loop:
-	for {
-		select {
-		case msg := <-channel:
-			fmt.Printf("Received msg: %s\n", msg)
-			break loop
-		}
+	select {
+
+	// Block until we have a signal, then return
+	case msg := <-channel.channel:
+		fmt.Printf("Received msg: %s\n", msg)
 	}
+	return nil
 }
 
-func (c *ChannelManager) closeChannel(pollId string) {
-	mutex.Lock()
-	defer mutex.Unlock()
-
-	delete(c.ChannelSlice, pollId)
+func (c *ChannelManager) Unsubscribe(poll *Poll) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.unsubscribe(poll)
 }
+
+func (c *ChannelManager) unsubscribe(poll *Poll) {
+	poll.once.Do(func() {
+		close(poll.channel)
+	})
+
+	// Find Poll. Exit early if one doesn't exist
+	poll, ok := c.ChannelSlice[poll.id]
+	if !ok {
+		return
+	}
+
+	// Remove Poll from ChannelManager map
+	delete(c.ChannelSlice, poll.id)
+}
+
+var (
+	ErrBlockedChannel  = errors.New("channel is blocked")
+	ErrChannelNotFound = errors.New("channel was not found")
+)

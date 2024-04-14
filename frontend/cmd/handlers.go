@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/emildel/gopoll/frontend/internal/data"
 	"github.com/emildel/gopoll/frontend/templates"
@@ -79,7 +80,7 @@ func (app *application) createPollPOSTWithSession(w http.ResponseWriter, r *http
 		return
 	}
 
-	app.sessionChannel.createChannel(pollId)
+	app.sessionChannel.CreateSubscription(pollId)
 
 	templates.PollCreator(form.Title, form.Questions, pollId).Render(r.Context(), w)
 }
@@ -103,9 +104,7 @@ func (app *application) answerPoll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.sessionChannel.sendMessage(pollId, "Update")
-
-	//go func() { app.notifierChannel <- "Update" }()
+	app.sessionChannel.SendMessage(pollId, "Update")
 
 	templates.AnswerSubmitted().Render(r.Context(), w)
 }
@@ -124,7 +123,21 @@ func (app *application) updateChart(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Block until channel receives an update
-	app.sessionChannel.waitOnChannel(pollId)
+	err := app.sessionChannel.WaitOnChannel(pollId)
+	if err != nil {
+		switch {
+		case errors.Is(err, ErrBlockedChannel):
+			w.Write([]byte("An error occurred processing your request"))
+			return
+
+		case errors.Is(err, ErrChannelNotFound):
+			w.Write([]byte("Could not find a poll with that ID"))
+			return
+		default:
+			w.Write([]byte(err.Error()))
+			return
+		}
+	}
 
 	poll, err := app.models.Polls.Get(pollId)
 	if err != nil {

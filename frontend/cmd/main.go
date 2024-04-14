@@ -67,6 +67,7 @@ func main() {
 
 	formDecoder := form.NewDecoder()
 
+	// Initialize ChannelManager for real-time updates of poll webpages
 	channelManager := NewChannelManager()
 
 	app := &application{
