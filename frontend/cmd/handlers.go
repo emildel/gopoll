@@ -24,12 +24,20 @@ func (app *application) joinSession(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sessionExists := app.sessionManager.GetString(r.Context(), fmt.Sprintf("PollId%s", session))
+	// If a cookie exists telling us the user created this poll, then render the
+	// template showing poll results
 	if sessionExists != "" {
-		templates.JoinSession(poll.Title, poll.Answers, session, true).Render(r.Context(), w)
+
+		// We're going to render the chart, so we need to get the latest results to make
+		// sure the chart doesn't render empty
+
+		templates.JoinSession(poll.Title, poll.Answers, poll.Results, session, true).Render(r.Context(), w)
 		return
 	}
 
-	templates.JoinSession(poll.Title, poll.Answers, session, false).Render(r.Context(), w)
+	// Otherwise, the user did not create this poll, so render the template with the
+	// possible answers for the user to answer
+	templates.JoinSession(poll.Title, poll.Answers, poll.Results, session, false).Render(r.Context(), w)
 
 }
 
@@ -53,7 +61,7 @@ func (app *application) createPollPOSTWithSession(w http.ResponseWriter, r *http
 
 	err := r.ParseForm()
 	if err != nil {
-		app.clientError(w, http.StatusInternalServerError)
+		app.serverErrorResponse(w, r, err)
 		return
 	}
 
@@ -76,13 +84,13 @@ func (app *application) createPollPOSTWithSession(w http.ResponseWriter, r *http
 
 	err = app.models.Polls.Insert(poll)
 	if err != nil {
-		app.clientError(w, http.StatusInternalServerError)
+		app.serverErrorResponse(w, r, err)
 		return
 	}
 
 	app.sessionChannel.CreateSubscription(pollId)
 
-	templates.PollCreator(form.Title, form.Questions, pollId).Render(r.Context(), w)
+	templates.PollCreator(form.Title, form.Questions, poll.Results, pollId).Render(r.Context(), w)
 }
 
 func (app *application) answerPoll(w http.ResponseWriter, r *http.Request) {
@@ -92,7 +100,7 @@ func (app *application) answerPoll(w http.ResponseWriter, r *http.Request) {
 
 	err := app.decodePostForm(r, &answer)
 	if err != nil {
-		app.clientError(w, http.StatusInternalServerError)
+		app.serverErrorResponse(w, r, err)
 		return
 	}
 
@@ -100,7 +108,7 @@ func (app *application) answerPoll(w http.ResponseWriter, r *http.Request) {
 	// value by 1 to update the result of the correct answer.
 	err = app.models.Polls.Update(answer.Answer+1, pollId)
 	if err != nil {
-		app.clientError(w, http.StatusInternalServerError)
+		app.serverErrorResponse(w, r, err)
 		return
 	}
 
