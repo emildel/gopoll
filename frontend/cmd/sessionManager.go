@@ -42,7 +42,7 @@ func (c *ChannelManager) SendMessage(pollId, message string) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	session, ok := c.ChannelSlice[pollId]
+	channel, ok := c.ChannelSlice[pollId]
 	if !ok {
 		fmt.Println("Session not found for channel")
 		return
@@ -50,7 +50,7 @@ func (c *ChannelManager) SendMessage(pollId, message string) {
 
 	select {
 	// If channel is not full (i.e. empty in our case), send a message to signal we should do an update
-	case session.channel <- message:
+	case channel.channel <- message:
 		// If the channel is full, we can just return since we're using the channel as a
 		// signal for the client to do an update to the database, and a "signal" is
 		// already there

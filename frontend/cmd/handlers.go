@@ -117,9 +117,9 @@ func (app *application) answerPoll(w http.ResponseWriter, r *http.Request) {
 	templates.AnswerSubmitted().Render(r.Context(), w)
 }
 
-// Gets called by Client to update the chart. Function is blocked until app.notifierChannel
-// receives an update. Once a new update is received, calls the database to get the updated results.
-// app.notifierChannel is written to in the answerPoll() handler.
+// Gets called by Client to update the chart. Once a new update is received,
+// calls the database to get the updated results. app.sessionChannel is written
+// to in the answerPoll() handler.
 func (app *application) updateChart(w http.ResponseWriter, r *http.Request) {
 
 	pollSessionFromUri := strings.Split(r.RequestURI, "/")[2]

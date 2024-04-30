@@ -10,7 +10,7 @@ import "context"
 import "io"
 import "bytes"
 
-func CreatorChartView(title string, answers []string, pollId string) templ.Component {
+func CreatorChartView(title string, answers []string, pollResults []int, pollId string) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -23,7 +23,7 @@ func CreatorChartView(title string, answers []string, pollId string) templ.Compo
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templ.RenderScriptItems(ctx, templ_7745c5c3_Buffer, loadChart(answers, pollId))
+		templ_7745c5c3_Err = templ.RenderScriptItems(ctx, templ_7745c5c3_Buffer, loadChart(answers, pollResults, pollId))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -31,7 +31,7 @@ func CreatorChartView(title string, answers []string, pollId string) templ.Compo
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var2 templ.ComponentScript = loadChart(answers, pollId)
+		var templ_7745c5c3_Var2 templ.ComponentScript = loadChart(answers, pollResults, pollId)
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var2.Call)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -56,7 +56,7 @@ func CreatorChartView(title string, answers []string, pollId string) templ.Compo
 	})
 }
 
-func PollCreator(title string, answers []string, pollId string) templ.Component {
+func PollCreator(title string, answers []string, pollResults []int, pollId string) templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 		if !templ_7745c5c3_IsBuffer {
@@ -75,7 +75,7 @@ func PollCreator(title string, answers []string, pollId string) templ.Component 
 				templ_7745c5c3_Buffer = templ.GetBuffer()
 				defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 			}
-			templ_7745c5c3_Err = CreatorChartView(title, answers, pollId).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = CreatorChartView(title, answers, pollResults, pollId).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -95,11 +95,11 @@ func PollCreator(title string, answers []string, pollId string) templ.Component 
 	})
 }
 
-func loadChart(answers []string, pollId string) templ.ComponentScript {
+func loadChart(answers []string, pollResults []int, pollId string) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_loadChart_90a1`,
-		Function: `function __templ_loadChart_90a1(answers, pollId){async function subscribe(pollId) {
-        const endpoint = "updateChart/" + pollId;
+		Name: `__templ_loadChart_2c17`,
+		Function: `function __templ_loadChart_2c17(answers, pollResults, pollId){async function subscribe(pollId) {
+        const endpoint = window.location.origin + "/updateChart/" + pollId;
 
         const response = await fetch(endpoint, {
             headers: {
@@ -138,6 +138,7 @@ func loadChart(answers []string, pollId string) templ.ComponentScript {
         labels: answers,
         datasets: [{
             label: '# of Votes',
+            data: pollResults,
             borderWidth: 1
         }]
     };
@@ -155,7 +156,6 @@ func loadChart(answers []string, pollId string) templ.ComponentScript {
         }
     }
 
-
     Chart.defaults.font.size = fontSize;
 
     var myChart = new Chart("myChart1", {
@@ -163,7 +163,7 @@ func loadChart(answers []string, pollId string) templ.ComponentScript {
         data: data,
         options: options
     });}`,
-		Call:       templ.SafeScript(`__templ_loadChart_90a1`, answers, pollId),
-		CallInline: templ.SafeScriptInline(`__templ_loadChart_90a1`, answers, pollId),
+		Call:       templ.SafeScript(`__templ_loadChart_2c17`, answers, pollResults, pollId),
+		CallInline: templ.SafeScriptInline(`__templ_loadChart_2c17`, answers, pollResults, pollId),
 	}
 }

@@ -1,7 +1,7 @@
 package templates
 
-templ CreatorChartView(title string, answers []string, pollId string) {
-    <body onload={ loadChart(answers, pollId) }>
+templ CreatorChartView(title string, answers []string, pollResults []int, pollId string) {
+    <body onload={ loadChart(answers, pollResults, pollId) }>
         <h1 class="flex justify-center text-center px-5 pt-14 pb-10 min-[601px]:pt-28 min-[601px]:pb-20 text-3xl font-extrabold underline">{ title }</h1>
 
         <div class="bg-[#FCFDFC] p-4">
@@ -12,16 +12,16 @@ templ CreatorChartView(title string, answers []string, pollId string) {
     </body>
 }
 
-templ PollCreator(title string, answers []string, pollId string) {
+templ PollCreator(title string, answers []string, pollResults []int, pollId string) {
     @Head("GoPoll | Your Poll") {
-        @CreatorChartView(title, answers, pollId)
+        @CreatorChartView(title, answers, pollResults, pollId)
     }
 }
 
-script loadChart(answers []string, pollId string) {
+script loadChart(answers []string, pollResults []int, pollId string) {
 
     async function subscribe(pollId) {
-        const endpoint = "updateChart/" + pollId;
+        const endpoint = window.location.origin + "/updateChart/" + pollId;
 
         const response = await fetch(endpoint, {
             headers: {
@@ -60,6 +60,7 @@ script loadChart(answers []string, pollId string) {
         labels: answers,
         datasets: [{
             label: '# of Votes',
+            data: pollResults,
             borderWidth: 1
         }]
     };
@@ -76,7 +77,6 @@ script loadChart(answers []string, pollId string) {
             }
         }
     }
-
 
     Chart.defaults.font.size = fontSize;
 
