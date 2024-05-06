@@ -1,10 +1,12 @@
 package main
 
 import (
-	"errors"
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/emildel/gopoll/frontend/internal/data"
 	"github.com/emildel/gopoll/frontend/templates"
+	"github.com/r3labs/sse/v2"
 	"net/http"
 	"strings"
 	"time"
@@ -88,7 +90,10 @@ func (app *application) createPollPOSTWithSession(w http.ResponseWriter, r *http
 		return
 	}
 
-	app.sessionChannel.CreateSubscription(pollId)
+	//app.sessionChannel.CreateSubscription(pollId)
+	stream := app.sseServer.CreateStream(pollId)
+
+	app.sseManager.AddStreamToManager(stream)
 
 	templates.PollCreator(form.Title, form.Questions, poll.Results, pollId).Render(r.Context(), w)
 }
@@ -106,13 +111,29 @@ func (app *application) answerPoll(w http.ResponseWriter, r *http.Request) {
 
 	// Postgres is 1 indexed (index starts at 1, not 0), so increase the index
 	// value by 1 to update the result of the correct answer.
-	err = app.models.Polls.Update(answer.Answer+1, pollId)
+	poll, err := app.models.Polls.Update(answer.Answer+1, pollId)
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 		return
 	}
 
-	app.sessionChannel.SendMessage(pollId, "Update")
+	jsonData := map[string]interface{}{
+		"answers": poll.Answers,
+		"results": poll.Results,
+	}
+
+	event, err := formatServerSentEvent(jsonData)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	//app.sessionChannel.SendMessage(pollId, "Update")
+	app.sseServer.Publish(pollId, &sse.Event{
+		Event: []byte(pollId),
+		Data:  []byte(event),
+	})
+
+	w.WriteHeader(200)
 
 	templates.AnswerSubmitted().Render(r.Context(), w)
 }
@@ -122,7 +143,9 @@ func (app *application) answerPoll(w http.ResponseWriter, r *http.Request) {
 // to in the answerPoll() handler.
 func (app *application) updateChart(w http.ResponseWriter, r *http.Request) {
 
-	pollSessionFromUri := strings.Split(r.RequestURI, "/")[2]
+	//rc := http.NewResponseController(w)
+
+	pollSessionFromUri := strings.Split(r.URL.Path, "/")[2]
 	pollId := app.sessionManager.GetString(r.Context(), fmt.Sprintf("PollId%s", pollSessionFromUri))
 
 	if pollId == "" {
@@ -130,37 +153,48 @@ func (app *application) updateChart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Block until channel receives an update
-	err := app.sessionChannel.WaitOnChannel(pollId)
+	//poll, err := app.models.Polls.Get(pollId)
+	//if err != nil {
+	//	app.clientError(w, http.StatusNotFound)
+	//	return
+	//}
+	//
+	//jsonData := map[string]interface{}{
+	//	"answers": poll.Answers,
+	//	"results": poll.Results,
+	//}
+
+	//event, err := formatServerSentEvent("updates", jsonData)
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//
+	//_, err = fmt.Fprint(w, event)
+	//if err != nil {
+	//	fmt.Println(err)
+	//	return
+	//}
+	//
+	//rc.Flush()
+}
+
+func formatServerSentEvent(data any) (string, error) {
+	m := map[string]any{
+		"data": data,
+	}
+
+	buff := bytes.NewBuffer([]byte{})
+
+	encoder := json.NewEncoder(buff)
+
+	err := encoder.Encode(m)
 	if err != nil {
-		switch {
-		case errors.Is(err, ErrBlockedChannel):
-			w.Write([]byte("An error occurred processing your request"))
-			return
-
-		case errors.Is(err, ErrChannelNotFound):
-			w.Write([]byte("Could not find a poll with that ID"))
-			return
-		default:
-			w.Write([]byte(err.Error()))
-			return
-		}
+		return "", err
 	}
 
-	poll, err := app.models.Polls.Get(pollId)
-	if err != nil {
-		app.clientError(w, http.StatusNotFound)
-		return
-	}
+	sb := strings.Builder{}
 
-	jsonData := map[string]interface{}{
-		"answers": poll.Answers,
-		"results": poll.Results,
-	}
+	sb.WriteString(fmt.Sprintf("%v\n\n", buff.String()))
 
-	err = app.writeJSON(w, http.StatusOK, envelope{"pollResults": jsonData}, nil)
-	if err != nil {
-		app.serverErrorResponse(w, r, err)
-		return
-	}
+	return sb.String(), nil
 }

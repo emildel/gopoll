@@ -10,7 +10,7 @@ require (
 	github.com/jackc/pgx/v5 v5.5.5
 	github.com/julienschmidt/httprouter v1.3.0
 	github.com/justinas/alice v1.2.0
-	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/r3labs/sse/v2 v2.10.0
 )
 
 require (
@@ -18,6 +18,8 @@ require (
 	github.com/jackc/pgservicefile v0.0.0-20221227161230-091c0ba34f0a // indirect
 	github.com/jackc/puddle/v2 v2.2.1 // indirect
 	golang.org/x/crypto v0.17.0 // indirect
+	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sync v0.1.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
+	gopkg.in/cenkalti/backoff.v1 v1.1.0 // indirect
 )

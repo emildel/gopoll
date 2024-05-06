@@ -42,7 +42,9 @@ func (app *application) routes() http.Handler {
 
 	router.HandlerFunc(http.MethodPost, "/answerPoll", app.answerPoll)
 
-	router.Handler(http.MethodGet, "/updateChart/:sessionId", dynamic.ThenFunc(app.updateChart))
+	//sseEnabled := dynamic.Append(app.sseActivated)
+
+	router.Handler(http.MethodGet, "/updateChart/:sessionId", app.sseActivated(dynamic.ThenFunc(app.updateChart)))
 
 	return router
 }

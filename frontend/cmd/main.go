@@ -9,6 +9,7 @@ import (
 	"github.com/emildel/gopoll/frontend/internal/data"
 	"github.com/go-playground/form/v4"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/r3labs/sse/v2"
 	"log/slog"
 	"net/http"
 	"os"
@@ -35,7 +36,10 @@ type application struct {
 	formDecoder    *form.Decoder
 	sessionManager *scs.SessionManager
 	models         data.Models
+	// Can probably delete sessionChannel
 	sessionChannel *ChannelManager
+	sseServer      *sse.Server
+	sseManager     *StreamManager
 }
 
 func main() {
@@ -70,6 +74,13 @@ func main() {
 	// Initialize ChannelManager for real-time updates of poll webpages
 	channelManager := NewChannelManager()
 
+	sseServer := sse.New()
+
+	//sseServer.AutoReplay = false
+	//sseServer.CreateStream("updates")
+
+	sseManager := NewStreamManager()
+
 	app := &application{
 		config:         cfg,
 		logger:         logger,
@@ -77,9 +88,9 @@ func main() {
 		sessionManager: scs.New(),
 		models:         data.NewModel(dbpool),
 		sessionChannel: channelManager,
+		sseServer:      sseServer,
+		sseManager:     sseManager,
 	}
-
-	app.sessionManager.Store = pgxstore.New(dbpool)
 
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", cfg.port),
@@ -89,6 +100,8 @@ func main() {
 		WriteTimeout: 10 * time.Second,
 		ErrorLog:     slog.NewLogLogger(logger.Handler(), slog.LevelError),
 	}
+
+	app.sessionManager.Store = pgxstore.New(dbpool)
 
 	logger.Info("starting server", "addr", server.Addr, "env", cfg.env)
 
