@@ -9,6 +9,8 @@ templ CreatorChartView(title string, answers []string, pollResults []int, pollId
                 <canvas id="myChart1"></canvas>
             </div>
         </div>
+
+        @openEventConnection(pollId)
     </body>
 }
 
@@ -18,38 +20,64 @@ templ PollCreator(title string, answers []string, pollResults []int, pollId stri
     }
 }
 
+script openEventConnection(pollId string) {
+
+    const eventSource = new EventSource("/updateChart/" + pollId + "?stream="+pollId);
+
+    eventSource.onopen = function() {
+        console.log("event openned")
+    };
+    
+    // eventSource.addEventListener(pollId, (event) => {
+    //     console.log("inside updates listener")
+    //     const parsedData = JSON.parse(event.data)
+    //     let chart = Chart.getChart("myChart1")
+    //     chart.data.datasets[0].data = parsedData.data.results;
+    //     chart.update();
+    // });
+
+    eventSource.onmessage = (event) => {
+        console.log("inside updates listener")
+        const chart = Chart.getChart("myChart1");
+        const parsedData = JSON.parse(event.data)
+        chart.data.datasets[0].data = parsedData.data.results;
+        chart.update();
+    };
+    
+}
+
 script loadChart(answers []string, pollResults []int, pollId string) {
 
-    async function subscribe(pollId) {
-        const endpoint = window.location.origin + "/updateChart/" + pollId;
+    // async function subscribe(pollId) {
+    //     const endpoint = window.location.origin + "/updateChart/" + pollId;
 
-        const response = await fetch(endpoint, {
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
+    //     const response = await fetch(endpoint, {
+    //         headers: {
+    //             'Accept': 'application/json'
+    //         }
+    //     });
 
-        if (response.status != 200) {
-            console.log(response.status);
+    //     if (response.status != 200) {
+    //         console.log(response.status);
 
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            await subscribe(pollId);
+    //         await new Promise(resolve => setTimeout(resolve, 1000));
+    //         await subscribe(pollId);
 
-        } else {
-            const results = await response.json();
+    //     } else {
+    //         const results = await response.json();
 
-            const scores = results.pollResults.results.map(function(index) {
-                return index;
-            });
+    //         const scores = results.pollResults.results.map(function(index) {
+    //             return index;
+    //         });
 
-            myChart.data.datasets[0].data = scores;
-            myChart.update();
+    //         myChart.data.datasets[0].data = scores;
+    //         myChart.update();
 
-            await subscribe(pollId);
-        };
-    };
+    //         await subscribe(pollId);
+    //     };
+    // };
 
-    subscribe(pollId);
+    // subscribe(pollId);
 
     var fontSize = 12;
     if(window.innerWidth > 600) {

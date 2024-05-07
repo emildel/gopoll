@@ -19,7 +19,7 @@ type Poll struct {
 type PollModelInterface interface {
 	Insert(poll *Poll) error
 	Get(pollId string) (*Poll, error)
-	Update(pollAnswer int, pollId string) error
+	Update(pollAnswer int, pollId string) (*Poll, error)
 }
 
 type PollModel struct {
@@ -78,7 +78,7 @@ func (p *PollModel) Get(pollId string) (*Poll, error) {
 	return &poll, nil
 }
 
-func (p *PollModel) Update(pollAnswer int, pollId string) error {
+func (p *PollModel) Update(pollAnswer int, pollId string) (*Poll, error) {
 	query := `
 		UPDATE poll
 		SET results[$1] = results[$1] + 1
@@ -89,8 +89,10 @@ func (p *PollModel) Update(pollAnswer int, pollId string) error {
 	defer cancel()
 
 	if _, err := p.DB.Exec(ctx, query, pollAnswer, pollId); err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	// Get the latest results which will be sent to the server-sent event for
+	// updating of the chart.
+	return p.Get(pollId)
 }
