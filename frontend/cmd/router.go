@@ -44,7 +44,7 @@ func (app *application) routes() http.Handler {
 
 	//sseEnabled := dynamic.Append(app.sseActivated)
 
-	router.Handler(http.MethodGet, "/updateChart/:sessionId", app.sseActivated(dynamic.ThenFunc(app.updateChart)))
+	router.HandlerFunc(http.MethodGet, "/updateChart/:sessionId", app.sseServer.ServeHTTP)
 
 	return router
 }

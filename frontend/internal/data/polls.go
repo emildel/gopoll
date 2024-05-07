@@ -92,5 +92,7 @@ func (p *PollModel) Update(pollAnswer int, pollId string) (*Poll, error) {
 		return nil, err
 	}
 
+	// Get the latest results which will be sent to the server-sent event for
+	// updating of the chart.
 	return p.Get(pollId)
 }

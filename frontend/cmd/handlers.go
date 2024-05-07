@@ -90,10 +90,7 @@ func (app *application) createPollPOSTWithSession(w http.ResponseWriter, r *http
 		return
 	}
 
-	//app.sessionChannel.CreateSubscription(pollId)
-	stream := app.sseServer.CreateStream(pollId)
-
-	app.sseManager.AddStreamToManager(stream)
+	app.sseServer.CreateStream(pollId)
 
 	templates.PollCreator(form.Title, form.Questions, poll.Results, pollId).Render(r.Context(), w)
 }
@@ -127,7 +124,6 @@ func (app *application) answerPoll(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 
-	//app.sessionChannel.SendMessage(pollId, "Update")
 	app.sseServer.Publish(pollId, &sse.Event{
 		Event: []byte(pollId),
 		Data:  []byte(event),
@@ -136,46 +132,6 @@ func (app *application) answerPoll(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(200)
 
 	templates.AnswerSubmitted().Render(r.Context(), w)
-}
-
-// Gets called by Client to update the chart. Once a new update is received,
-// calls the database to get the updated results. app.sessionChannel is written
-// to in the answerPoll() handler.
-func (app *application) updateChart(w http.ResponseWriter, r *http.Request) {
-
-	//rc := http.NewResponseController(w)
-
-	pollSessionFromUri := strings.Split(r.URL.Path, "/")[2]
-	pollId := app.sessionManager.GetString(r.Context(), fmt.Sprintf("PollId%s", pollSessionFromUri))
-
-	if pollId == "" {
-		app.clientError(w, http.StatusMethodNotAllowed)
-		return
-	}
-
-	//poll, err := app.models.Polls.Get(pollId)
-	//if err != nil {
-	//	app.clientError(w, http.StatusNotFound)
-	//	return
-	//}
-	//
-	//jsonData := map[string]interface{}{
-	//	"answers": poll.Answers,
-	//	"results": poll.Results,
-	//}
-
-	//event, err := formatServerSentEvent("updates", jsonData)
-	//if err != nil {
-	//	fmt.Println(err)
-	//}
-	//
-	//_, err = fmt.Fprint(w, event)
-	//if err != nil {
-	//	fmt.Println(err)
-	//	return
-	//}
-	//
-	//rc.Flush()
 }
 
 func formatServerSentEvent(data any) (string, error) {

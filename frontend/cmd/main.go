@@ -36,10 +36,7 @@ type application struct {
 	formDecoder    *form.Decoder
 	sessionManager *scs.SessionManager
 	models         data.Models
-	// Can probably delete sessionChannel
-	sessionChannel *ChannelManager
 	sseServer      *sse.Server
-	sseManager     *StreamManager
 }
 
 func main() {
@@ -71,15 +68,8 @@ func main() {
 
 	formDecoder := form.NewDecoder()
 
-	// Initialize ChannelManager for real-time updates of poll webpages
-	channelManager := NewChannelManager()
-
 	sseServer := sse.New()
-
-	//sseServer.AutoReplay = false
-	//sseServer.CreateStream("updates")
-
-	sseManager := NewStreamManager()
+	sseServer.AutoReplay = false
 
 	app := &application{
 		config:         cfg,
@@ -87,9 +77,7 @@ func main() {
 		formDecoder:    formDecoder,
 		sessionManager: scs.New(),
 		models:         data.NewModel(dbpool),
-		sessionChannel: channelManager,
 		sseServer:      sseServer,
-		sseManager:     sseManager,
 	}
 
 	server := &http.Server{
