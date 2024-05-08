@@ -1,6 +1,6 @@
 package templates
 
-templ CreatorChartView(title string, answers []string, pollResults []int, pollId string) {
+templ CreatorChartView(title string, answers []string, pollResults []int, pollId string, env string) {
     <body onload={ loadChart(answers, pollResults, pollId) }>
         <h1 class="flex justify-center text-center px-5 pt-14 pb-10 min-[601px]:pt-28 min-[601px]:pb-20 text-3xl font-extrabold underline">{ title }</h1>
 
@@ -10,18 +10,37 @@ templ CreatorChartView(title string, answers []string, pollResults []int, pollId
             </div>
         </div>
 
-        <div class="flex flex-col gap-y-8 justify-center items-center mt-20">
-            <h1 class="text-2xl">Want to easily share this poll with others? Copy the link below!</h1>
-            <button id="copyURLButton" class="w-full max-w-[200px] text-[#809D80] py-5 duration-300 cursor-pointer border-2 border-[#809D80] hover:underline rounded" onclick={ copyUrl() } role="button">Copy</button>
-        </div>
+        <div class="px-4">
+            <div class="flex flex-col justify-center items-center text-center mt-20 mb-5">
+                <h1 class="text-2xl">Want to easily share this poll with others? Copy the link below!</h1>
+            </div>
 
+            <div class="m-auto max-w-[800px] bg-slate-50 border-2 border-[#809D80] rounded-sm px-4">
+                <div class="flex justify-between items-center py-1">
+                    <code>
+                        { getUrlToCopy(pollId, env) }
+                    </code>
+                    <div class="flex items-center w-[120px]">
+                        <button id="copyURLButton"
+                            class="w-full py-1 px-2 bg-[#809D80] text-zinc-50 duration-300 cursor-pointer border border-slate-950 hover:bg-[#5c735c] hover:text-white rounded-sm"
+                            onclick={ copyUrl(getUrlToCopy(pollId, env)) }
+                            role="button">
+                        Copy
+                        <img src="../assets/images/copy.png" width="20" height="20" class=" mt-1 float-right" />
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         @openEventConnection(pollId)
+        <!-- icons from <a href="https://www.flaticon.com/free-icons/copy" title="copy icons">Copy icons created by Freepik - Flaticon</a> -->
     </body>
 }
 
-templ PollCreator(title string, answers []string, pollResults []int, pollId string) {
+templ PollCreator(title string, answers []string, pollResults []int, pollId string, env string) {
     @Head("GoPoll | Your Poll") {
-        @CreatorChartView(title, answers, pollResults, pollId)
+        @CreatorChartView(title, answers, pollResults, pollId, env)
     }
 }
 
@@ -42,10 +61,10 @@ script openEventConnection(pollId string) {
     };
 }
 
-script copyUrl() {
+script copyUrl(url string) {
 
     const initialText = document.getElementById('copyURLButton').innerHTML;
-    window.navigator.clipboard.writeText("GoPoll URL");
+    window.navigator.clipboard.writeText(url);
 
     document.getElementById('copyURLButton').innerHTML = "Copied!";
     setTimeout(function() {

@@ -10,6 +10,8 @@ import "context"
 import "io"
 import "bytes"
 
+import "fmt"
+
 func AnswerSubmitted() templ.Component {
 	return templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
@@ -50,4 +52,12 @@ func AnswerSubmitted() templ.Component {
 		}
 		return templ_7745c5c3_Err
 	})
+}
+
+func getUrlToCopy(pollId, env string) string {
+	if env == "test-dev" {
+		return fmt.Sprintf("https://localhost:81/joinPoll?session=%s", pollId)
+	}
+
+	return fmt.Sprintf("some productionurl, %s", pollId)
 }

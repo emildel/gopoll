@@ -1,9 +1,19 @@
 package templates
 
+import "fmt"
+
 templ AnswerSubmitted() {
     <h1 class="text-center text-2xl pt-14 min-[601px]:pt-28">Your answer has been submitted.</h1>
 
     <div class="mx-auto flex flex-col my-10 max-w-[200px] bg-[#FCFDFC]">
         <a href="/" class="text-[#809D80] text-center py-5 duration-300 cursor-pointer border-2 border-[#809D80] hover:underline rounded">Home</a>
     </div>
+}
+
+func getUrlToCopy(pollId, env string) string {
+    if env == "test-dev" {
+        return fmt.Sprintf("https://localhost:81/joinPoll?session=%s", pollId)
+    } 
+
+    return fmt.Sprintf("some productionurl, %s", pollId)
 }

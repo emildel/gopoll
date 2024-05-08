@@ -33,13 +33,13 @@ func (app *application) joinSession(w http.ResponseWriter, r *http.Request) {
 		// We're going to render the chart, so we need to get the latest results to make
 		// sure the chart doesn't render empty
 
-		templates.JoinSession(poll.Title, poll.Answers, poll.Results, session, true).Render(r.Context(), w)
+		templates.JoinSession(poll.Title, poll.Answers, poll.Results, session, true, app.config.env).Render(r.Context(), w)
 		return
 	}
 
 	// Otherwise, the user did not create this poll, so render the template with the
 	// possible answers for the user to answer
-	templates.JoinSession(poll.Title, poll.Answers, poll.Results, session, false).Render(r.Context(), w)
+	templates.JoinSession(poll.Title, poll.Answers, poll.Results, session, false, app.config.env).Render(r.Context(), w)
 
 }
 
@@ -92,7 +92,7 @@ func (app *application) createPollPOSTWithSession(w http.ResponseWriter, r *http
 
 	app.sseServer.CreateStream(pollId)
 
-	templates.PollCreator(form.Title, form.Questions, poll.Results, pollId).Render(r.Context(), w)
+	templates.PollCreator(form.Title, form.Questions, poll.Results, pollId, app.config.env).Render(r.Context(), w)
 }
 
 func (app *application) answerPoll(w http.ResponseWriter, r *http.Request) {

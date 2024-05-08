@@ -2,10 +2,10 @@ package templates
 
 import "strconv"
 
-templ JoinSession(title string, answers []string, pollResults []int, pollId string, isCreator bool) {
+templ JoinSession(title string, answers []string, pollResults []int, pollId string, isCreator bool, env string) {
     @Head("GoPoll | Session") {
         if isCreator {
-            @CreatorChartView(title, answers, pollResults, pollId)
+            @CreatorChartView(title, answers, pollResults, pollId, env)
         } else {
             @AnswerPollView(title, answers)
         }
