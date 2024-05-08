@@ -10,6 +10,11 @@ templ CreatorChartView(title string, answers []string, pollResults []int, pollId
             </div>
         </div>
 
+        <div class="flex flex-col gap-y-8 justify-center items-center mt-20">
+            <h1 class="text-2xl">Want to easily share this poll with others? Copy the link below!</h1>
+            <button id="copyURLButton" class="w-full max-w-[200px] text-[#809D80] py-5 duration-300 cursor-pointer border-2 border-[#809D80] hover:underline rounded" onclick={ copyUrl() } role="button">Copy</button>
+        </div>
+
         @openEventConnection(pollId)
     </body>
 }
@@ -27,14 +32,6 @@ script openEventConnection(pollId string) {
     eventSource.onopen = function() {
         console.log("event openned")
     };
-    
-    // eventSource.addEventListener(pollId, (event) => {
-    //     console.log("inside updates listener")
-    //     const parsedData = JSON.parse(event.data)
-    //     let chart = Chart.getChart("myChart1")
-    //     chart.data.datasets[0].data = parsedData.data.results;
-    //     chart.update();
-    // });
 
     eventSource.onmessage = (event) => {
         console.log("inside updates listener")
@@ -43,46 +40,26 @@ script openEventConnection(pollId string) {
         chart.data.datasets[0].data = parsedData.data.results;
         chart.update();
     };
-    
+}
+
+script copyUrl() {
+
+    const initialText = document.getElementById('copyURLButton').innerHTML;
+    window.navigator.clipboard.writeText("GoPoll URL");
+
+    document.getElementById('copyURLButton').innerHTML = "Copied!";
+    setTimeout(function() {
+        // Set button text back to what it was before it was changed to Copied!
+        document.getElementById('copyURLButton').innerHTML = initialText;
+    }, 500);      
 }
 
 script loadChart(answers []string, pollResults []int, pollId string) {
 
-    // async function subscribe(pollId) {
-    //     const endpoint = window.location.origin + "/updateChart/" + pollId;
-
-    //     const response = await fetch(endpoint, {
-    //         headers: {
-    //             'Accept': 'application/json'
-    //         }
-    //     });
-
-    //     if (response.status != 200) {
-    //         console.log(response.status);
-
-    //         await new Promise(resolve => setTimeout(resolve, 1000));
-    //         await subscribe(pollId);
-
-    //     } else {
-    //         const results = await response.json();
-
-    //         const scores = results.pollResults.results.map(function(index) {
-    //             return index;
-    //         });
-
-    //         myChart.data.datasets[0].data = scores;
-    //         myChart.update();
-
-    //         await subscribe(pollId);
-    //     };
-    // };
-
-    // subscribe(pollId);
-
     var fontSize = 12;
     if(window.innerWidth > 600) {
         fontSize = 16;
-    }
+    };
 
     var data = {
         labels: answers,

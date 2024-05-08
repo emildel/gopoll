@@ -28,4 +28,6 @@ gopoll.iml
 modules.xml
 vcs.xml
 
-node_modules
+node_modules/
+
+tls/

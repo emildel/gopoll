@@ -45,7 +45,42 @@ func CreatorChartView(title string, answers []string, pollResults []int, pollId 
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h1><div class=\"bg-[#FCFDFC] p-4\"><div class=\"flex justify-center items-center relative m-auto h-[50vh] max-w-[1200px] px-2 min-[601px]:px-4 shadow-lg shadow-slate-200 rounded\"><canvas id=\"myChart1\"></canvas></div></div>")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h1><div class=\"bg-[#FCFDFC] p-4\"><div class=\"flex justify-center items-center relative m-auto h-[50vh] max-w-[1200px] px-2 min-[601px]:px-4 shadow-lg shadow-slate-200 rounded\"><canvas id=\"myChart1\"></canvas></div></div><div class=\"flex flex-col gap-y-8 justify-center items-center mt-20\"><h1 class=\"text-2xl\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Var4 := `Want to easily share this poll with others? Copy the link below!`
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var4)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h1>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templ.RenderScriptItems(ctx, templ_7745c5c3_Buffer, copyUrl())
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button id=\"copyURLButton\" class=\"w-full max-w-[200px] text-[#809D80] py-5 duration-300 cursor-pointer border-2 border-[#809D80] hover:underline rounded\" onclick=\"")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var5 templ.ComponentScript = copyUrl()
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var5.Call)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("\" role=\"button\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Var6 := `Copy`
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ_7745c5c3_Var6)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</button></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -72,12 +107,12 @@ func PollCreator(title string, answers []string, pollResults []int, pollId strin
 			defer templ.ReleaseBuffer(templ_7745c5c3_Buffer)
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var4 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var4 == nil {
-			templ_7745c5c3_Var4 = templ.NopComponent
+		templ_7745c5c3_Var7 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var7 == nil {
+			templ_7745c5c3_Var7 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Var5 := templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
+		templ_7745c5c3_Var8 := templ.ComponentFunc(func(ctx context.Context, templ_7745c5c3_W io.Writer) (templ_7745c5c3_Err error) {
 			templ_7745c5c3_Buffer, templ_7745c5c3_IsBuffer := templ_7745c5c3_W.(*bytes.Buffer)
 			if !templ_7745c5c3_IsBuffer {
 				templ_7745c5c3_Buffer = templ.GetBuffer()
@@ -92,7 +127,7 @@ func PollCreator(title string, answers []string, pollResults []int, pollId strin
 			}
 			return templ_7745c5c3_Err
 		})
-		templ_7745c5c3_Err = Head("GoPoll | Your Poll").Render(templ.WithChildren(ctx, templ_7745c5c3_Var5), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = Head("GoPoll | Your Poll").Render(templ.WithChildren(ctx, templ_7745c5c3_Var8), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -105,20 +140,12 @@ func PollCreator(title string, answers []string, pollResults []int, pollId strin
 
 func openEventConnection(pollId string) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_openEventConnection_da89`,
-		Function: `function __templ_openEventConnection_da89(pollId){const eventSource = new EventSource("/updateChart/" + pollId + "?stream="+pollId);
+		Name: `__templ_openEventConnection_6e34`,
+		Function: `function __templ_openEventConnection_6e34(pollId){const eventSource = new EventSource("/updateChart/" + pollId + "?stream="+pollId);
 
     eventSource.onopen = function() {
         console.log("event openned")
     };
-    
-    // eventSource.addEventListener(pollId, (event) => {
-    //     console.log("inside updates listener")
-    //     const parsedData = JSON.parse(event.data)
-    //     let chart = Chart.getChart("myChart1")
-    //     chart.data.datasets[0].data = parsedData.data.results;
-    //     chart.update();
-    // });
 
     eventSource.onmessage = (event) => {
         console.log("inside updates listener")
@@ -127,49 +154,34 @@ func openEventConnection(pollId string) templ.ComponentScript {
         chart.data.datasets[0].data = parsedData.data.results;
         chart.update();
     };}`,
-		Call:       templ.SafeScript(`__templ_openEventConnection_da89`, pollId),
-		CallInline: templ.SafeScriptInline(`__templ_openEventConnection_da89`, pollId),
+		Call:       templ.SafeScript(`__templ_openEventConnection_6e34`, pollId),
+		CallInline: templ.SafeScriptInline(`__templ_openEventConnection_6e34`, pollId),
+	}
+}
+
+func copyUrl() templ.ComponentScript {
+	return templ.ComponentScript{
+		Name: `__templ_copyUrl_08c7`,
+		Function: `function __templ_copyUrl_08c7(){const initialText = document.getElementById('copyURLButton').innerHTML;
+    window.navigator.clipboard.writeText("GoPoll URL");
+
+    document.getElementById('copyURLButton').innerHTML = "Copied!";
+    setTimeout(function() {
+        // Set button text back to what it was before it was changed to Copied!
+        document.getElementById('copyURLButton').innerHTML = initialText;
+    }, 750);}`,
+		Call:       templ.SafeScript(`__templ_copyUrl_08c7`),
+		CallInline: templ.SafeScriptInline(`__templ_copyUrl_08c7`),
 	}
 }
 
 func loadChart(answers []string, pollResults []int, pollId string) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_loadChart_3a3d`,
-		Function: `function __templ_loadChart_3a3d(answers, pollResults, pollId){// async function subscribe(pollId) {
-    //     const endpoint = window.location.origin + "/updateChart/" + pollId;
-
-    //     const response = await fetch(endpoint, {
-    //         headers: {
-    //             'Accept': 'application/json'
-    //         }
-    //     });
-
-    //     if (response.status != 200) {
-    //         console.log(response.status);
-
-    //         await new Promise(resolve => setTimeout(resolve, 1000));
-    //         await subscribe(pollId);
-
-    //     } else {
-    //         const results = await response.json();
-
-    //         const scores = results.pollResults.results.map(function(index) {
-    //             return index;
-    //         });
-
-    //         myChart.data.datasets[0].data = scores;
-    //         myChart.update();
-
-    //         await subscribe(pollId);
-    //     };
-    // };
-
-    // subscribe(pollId);
-
-    var fontSize = 12;
+		Name: `__templ_loadChart_61f0`,
+		Function: `function __templ_loadChart_61f0(answers, pollResults, pollId){var fontSize = 12;
     if(window.innerWidth > 600) {
         fontSize = 16;
-    }
+    };
 
     var data = {
         labels: answers,
@@ -200,7 +212,7 @@ func loadChart(answers []string, pollResults []int, pollId string) templ.Compone
         data: data,
         options: options
     });}`,
-		Call:       templ.SafeScript(`__templ_loadChart_3a3d`, answers, pollResults, pollId),
-		CallInline: templ.SafeScriptInline(`__templ_loadChart_3a3d`, answers, pollResults, pollId),
+		Call:       templ.SafeScript(`__templ_loadChart_61f0`, answers, pollResults, pollId),
+		CallInline: templ.SafeScriptInline(`__templ_loadChart_61f0`, answers, pollResults, pollId),
 	}
 }

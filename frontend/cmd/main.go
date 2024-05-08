@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"flag"
 	"fmt"
 	"github.com/alexedwards/scs/pgxstore"
@@ -68,6 +69,11 @@ func main() {
 
 	formDecoder := form.NewDecoder()
 
+	sessionManager := scs.New()
+	// Look into using pgxstore.NewWithCleanupInterval
+	sessionManager.Store = pgxstore.New(dbpool)
+	sessionManager.Cookie.Secure = true
+
 	sseServer := sse.New()
 	sseServer.AutoReplay = false
 
@@ -80,6 +86,10 @@ func main() {
 		sseServer:      sseServer,
 	}
 
+	tlsConfig := &tls.Config{
+		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
+	}
+
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", cfg.port),
 		Handler:      app.routes(),
@@ -87,13 +97,12 @@ func main() {
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		ErrorLog:     slog.NewLogLogger(logger.Handler(), slog.LevelError),
+		TLSConfig:    tlsConfig,
 	}
-
-	app.sessionManager.Store = pgxstore.New(dbpool)
 
 	logger.Info("starting server", "addr", server.Addr, "env", cfg.env)
 
-	err = http.ListenAndServe(fmt.Sprintf(":%d", cfg.port), app.routes())
+	err = server.ListenAndServeTLS("../tls/cert.pem", "../tls/key.pem")
 	if err != nil {
 		panic(err)
 	}
