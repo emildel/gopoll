@@ -63,7 +63,7 @@ func CreatorChartView(title string, answers []string, pollResults []int, pollId 
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</code><div class=\"flex items-center\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</code><div class=\"flex items-center w-[120px]\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -71,7 +71,7 @@ func CreatorChartView(title string, answers []string, pollResults []int, pollId 
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button id=\"copyURLButton\" class=\"w-[120px] py-1 px-2 bg-[#809D80] text-zinc-50 duration-300 cursor-pointer border border-slate-950 hover:bg-[#5c735c] hover:text-white rounded-sm\" onclick=\"")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<button id=\"copyURLButton\" class=\"w-full py-1 px-2 bg-[#809D80] text-zinc-50 duration-300 cursor-pointer border border-slate-950 hover:bg-[#5c735c] hover:text-white rounded-sm\" onclick=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -179,17 +179,17 @@ func openEventConnection(pollId string) templ.ComponentScript {
 
 func copyUrl(url string) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_copyUrl_ab83`,
-		Function: `function __templ_copyUrl_ab83(url){const initialText = document.getElementById('copyURLButton').innerHTML;
+		Name: `__templ_copyUrl_b876`,
+		Function: `function __templ_copyUrl_b876(url){const initialText = document.getElementById('copyURLButton').innerHTML;
     window.navigator.clipboard.writeText(url);
 
     document.getElementById('copyURLButton').innerHTML = "Copied!";
     setTimeout(function() {
         // Set button text back to what it was before it was changed to Copied!
         document.getElementById('copyURLButton').innerHTML = initialText;
-    }, 500);}`,
-		Call:       templ.SafeScript(`__templ_copyUrl_ab83`, url),
-		CallInline: templ.SafeScriptInline(`__templ_copyUrl_ab83`, url),
+    }, 750);}`,
+		Call:       templ.SafeScript(`__templ_copyUrl_b876`, url),
+		CallInline: templ.SafeScriptInline(`__templ_copyUrl_b876`, url),
 	}
 }
 

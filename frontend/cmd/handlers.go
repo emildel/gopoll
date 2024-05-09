@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/emildel/gopoll/frontend/internal/data"
 	"github.com/emildel/gopoll/frontend/templates"
@@ -20,10 +21,22 @@ func (app *application) joinSession(w http.ResponseWriter, r *http.Request) {
 	}
 
 	poll, err := app.models.Polls.Get(session)
-	if err != nil {
-		app.clientError(w, http.StatusNotFound)
+	switch {
+	case errors.Is(data.ErrRecordNotFound, err):
+		//Poll with this sessionId does not exist, so return the form with error validation. No redirection
+		html := fmt.Sprintf(`<div hx-target="this" hx-swap="outerHTML">
+                        <h1 class="font-bold text-2xl mb-2">Join a session</h1>
+                        <input type="text" id="joinSessionForm" class="p-5 border-2 border-solid border-red-400" name="session" value="%s" placeholder="Enter your session id..." autocomplete="off" /> <br />
+                        <div class="text-red-400">Session does not exist</div>
+						<input type="submit" value="Enter" class="mt-4 bg-slate-50 text-neutral-950 py-5 px-10 text-center duration-300 cursor-pointer border-2 border-solid border-slate-950 hover:bg-[#555555] hover:text-white" />
+                    </div>`, session)
+
+		w.Write([]byte(html))
 		return
 	}
+
+	// No errors, so we will be redirecting to the joinPoll page
+	w.Header().Set("HX-Redirect", fmt.Sprintf("/joinPoll?session=%s", session))
 
 	sessionExists := app.sessionManager.GetString(r.Context(), fmt.Sprintf("PollId%s", session))
 	// If a cookie exists telling us the user created this poll, then render the
@@ -154,3 +167,22 @@ func formatServerSentEvent(data any) (string, error) {
 
 	return sb.String(), nil
 }
+
+//func (app *application) validatePollSession(w http.ResponseWriter, r *http.Request) {
+//	app.logger.Info("inside validate pollsession")
+//
+//	session := r.URL.Query().Get("session")
+//	if session == "" {
+//		app.notFound(w)
+//		return
+//	}
+//
+//
+//
+//	_, err := app.models.Polls.Get(session)
+//	switch {
+//	case errors.Is(data.ErrRecordNotFound, err):
+//
+//	}
+//	return
+//}
