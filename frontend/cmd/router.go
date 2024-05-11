@@ -33,12 +33,13 @@ func (app *application) routes() http.Handler {
 		templates.CreateSession().Render(r.Context(), w)
 	})
 
-	// First POST call to generate a unique ID to put in the URL
+	// First POST called when 'Create poll' button is pressed, to generate a unique
+	// ID to put in the URL
 	router.Handler(http.MethodPost, "/createPoll", dynamic.ThenFunc(app.createPollPOST))
 
 	// Redirect to new URL with the previously created unique ID
 	router.Handler(http.MethodPost, "/createPoll/:sessionId", dynamic.ThenFunc(app.createPollPOSTWithSession))
-	router.Handler(http.MethodGet, "/createPoll/:sessionId", dynamic.ThenFunc(app.createPollPOSTWithSession))
+	router.Handler(http.MethodGet, "/createPoll/:sessionId", dynamic.ThenFunc(app.createPollGETWithSession))
 
 	router.HandlerFunc(http.MethodPost, "/answerPoll", app.answerPoll)
 

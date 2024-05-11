@@ -38,14 +38,12 @@ func (app *application) joinSession(w http.ResponseWriter, r *http.Request) {
 	// No errors, so we will be redirecting to the joinPoll page
 	w.Header().Set("HX-Redirect", fmt.Sprintf("/joinPoll?session=%s", session))
 
-	sessionExists := app.sessionManager.GetString(r.Context(), fmt.Sprintf("PollId%s", session))
+	// Try to get session and convert to string. Only care about the presence of a session, not its value
+	_, pollCreator := app.sessionManager.Get(r.Context(), fmt.Sprintf("PollId%s", session)).(string)
+
 	// If a cookie exists telling us the user created this poll, then render the
 	// template showing poll results
-	if sessionExists != "" {
-
-		// We're going to render the chart, so we need to get the latest results to make
-		// sure the chart doesn't render empty
-
+	if pollCreator {
 		templates.JoinSession(poll.Title, poll.Answers, poll.Results, session, true, app.config.env).Render(r.Context(), w)
 		return
 	}
@@ -147,6 +145,30 @@ func (app *application) answerPoll(w http.ResponseWriter, r *http.Request) {
 	templates.AnswerSubmitted().Render(r.Context(), w)
 }
 
+func (app *application) createPollGETWithSession(w http.ResponseWriter, r *http.Request) {
+	pollSessionFromUri := strings.Split(r.RequestURI, "/")[2]
+
+	poll, err := app.models.Polls.Get(pollSessionFromUri)
+	if err != nil {
+		app.notFound(w)
+		return
+	}
+
+	_, pollCreator := app.sessionManager.Get(r.Context(), fmt.Sprintf("PollId%s", pollSessionFromUri)).(string)
+
+	if pollCreator {
+		templates.JoinSession(poll.Title, poll.Answers, poll.Results, pollSessionFromUri, true, app.config.env).Render(r.Context(), w)
+		return
+	}
+
+	// Otherwise, the user did not create this poll, so render the template with the
+	// possible answers for the user to answer
+	// No errors, so we will be redirecting to the joinPoll page
+	//w.Header().Set("HX-Redirect", fmt.Sprintf("/joinPoll?session=%s", pollSessionFromUri))
+	http.Redirect(w, r, fmt.Sprintf("/joinPoll?session=%s", pollSessionFromUri), http.StatusSeeOther)
+	//templates.JoinSession(poll.Title, poll.Answers, poll.Results, pollSessionFromUri, false, app.config.env).Render(r.Context(), w)
+}
+
 func formatServerSentEvent(data any) (string, error) {
 	m := map[string]any{
 		"data": data,
@@ -167,22 +189,3 @@ func formatServerSentEvent(data any) (string, error) {
 
 	return sb.String(), nil
 }
-
-//func (app *application) validatePollSession(w http.ResponseWriter, r *http.Request) {
-//	app.logger.Info("inside validate pollsession")
-//
-//	session := r.URL.Query().Get("session")
-//	if session == "" {
-//		app.notFound(w)
-//		return
-//	}
-//
-//
-//
-//	_, err := app.models.Polls.Get(session)
-//	switch {
-//	case errors.Is(data.ErrRecordNotFound, err):
-//
-//	}
-//	return
-//}

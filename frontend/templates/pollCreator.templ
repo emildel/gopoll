@@ -49,7 +49,7 @@ script openEventConnection(pollId string) {
     const eventSource = new EventSource("/updateChart/" + pollId + "?stream="+pollId);
 
     eventSource.onopen = function() {
-        console.log("event openned")
+        console.log("event openned");
     };
 
     eventSource.onmessage = (event) => {

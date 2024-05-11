@@ -18,7 +18,7 @@ templ AnswerPollView(title string, answers []string) {
 
         <div class="mx-auto overflow-hidden align-middle px-4 bg-[#FCFDFC]">
             <form hx-post="answerPoll" hx-target="#parentContainer">
-                <div class="mx-auto w-full mt-5 min-[601px]:mt-10 min-[601px]:py-10 pl-4 max-w-[900px] h-[27rem] overflow-y-auto overscroll-auto min-[601px]:overscroll:contain scrollbar-gutter-stable shadow-lg shadow-slate-200 rounded">
+                <div class="mx-auto w-full mt-5 min-[601px]:mt-10 min-[601px]:py-10 pl-4 max-w-[900px] h-[34rem] overflow-y-auto overscroll-auto min-[601px]:overscroll:contain scrollbar-gutter-stable shadow-lg shadow-slate-200 rounded">
                     <div class="flex flex-wrap flex-col">
                         for index, answer := range answers {
                         <label class="text-xl align-top mb-4 py-5 pl-4 border rounded-sm border-solid border-gray-400 cursor-pointer">

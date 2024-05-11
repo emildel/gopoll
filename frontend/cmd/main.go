@@ -70,12 +70,11 @@ func main() {
 	formDecoder := form.NewDecoder()
 
 	sessionManager := scs.New()
-	// Look into using pgxstore.NewWithCleanupInterval
-	sessionManager.Store = pgxstore.New(dbpool)
+	sessionManager.Store = pgxstore.NewWithCleanupInterval(dbpool, time.Hour*24)
 	sessionManager.Cookie.Secure = true
 
 	sseServer := sse.New()
-	sseServer.AutoReplay = false
+	sseServer.AutoStream = true
 
 	app := &application{
 		config:         cfg,
