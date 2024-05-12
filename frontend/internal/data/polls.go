@@ -79,20 +79,27 @@ func (p *PollModel) Get(pollId string) (*Poll, error) {
 }
 
 func (p *PollModel) Update(pollAnswer int, pollId string) (*Poll, error) {
-	query := `
-		UPDATE poll
-		SET results[$1] = results[$1] + 1
-		WHERE pollSession = $2
-		`
 
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	query := "CALL poll_updates_results($1, $2, $3, $4)"
+
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Minute)
 	defer cancel()
 
-	if _, err := p.DB.Exec(ctx, query, pollAnswer, pollId); err != nil {
-		return nil, err
+	var poll Poll
+
+	err := p.DB.QueryRow(ctx, query, pollId, pollAnswer, nil, nil).Scan(
+		&poll.Answers,
+		&poll.Results,
+	)
+
+	if err != nil {
+		switch {
+		case errors.Is(err, pgx.ErrNoRows):
+			return nil, ErrRecordNotFound
+		default:
+			return nil, err
+		}
 	}
 
-	// Get the latest results which will be sent to the server-sent event for
-	// updating of the chart.
-	return p.Get(pollId)
+	return &poll, nil
 }

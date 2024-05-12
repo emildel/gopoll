@@ -158,12 +158,11 @@ func PollCreator(title string, answers []string, pollResults []int, pollId strin
 
 func openEventConnection(pollId string) templ.ComponentScript {
 	return templ.ComponentScript{
-		Name: `__templ_openEventConnection_5953`,
-		Function: `function __templ_openEventConnection_5953(pollId){const eventSource = new EventSource("/updateChart/" + pollId + "?stream="+pollId);
+		Name: `__templ_openEventConnection_20e8`,
+		Function: `function __templ_openEventConnection_20e8(pollId){const eventSource = new EventSource("/updateChart/" + pollId + "?stream="+pollId);
 
     eventSource.onopen = function() {
         console.log("event openned");
-        console.log(eventSource);
     };
 
     eventSource.onmessage = (event) => {
@@ -173,8 +172,8 @@ func openEventConnection(pollId string) templ.ComponentScript {
         chart.data.datasets[0].data = parsedData.data.results;
         chart.update();
     };}`,
-		Call:       templ.SafeScript(`__templ_openEventConnection_5953`, pollId),
-		CallInline: templ.SafeScriptInline(`__templ_openEventConnection_5953`, pollId),
+		Call:       templ.SafeScript(`__templ_openEventConnection_20e8`, pollId),
+		CallInline: templ.SafeScriptInline(`__templ_openEventConnection_20e8`, pollId),
 	}
 }
 
