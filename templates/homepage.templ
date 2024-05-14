@@ -1,0 +1,28 @@
+package templates
+
+templ Homepage() {
+    @Head("Gopoll") {
+        <div>
+            <div class="pt-28 pb-20 text-6xl font-extrabold flex justify-center items-center underline">
+                <h1>Gopoll</h1>
+            </div>
+            <div class="mx-auto w-fit justify-center text-center p-5 bg-[#e1eafa] border-2 border-solid border-slate-950">
+                <form hx-get="/joinPoll">
+                    <div hx-target="this" hx-swap="outerHTML">
+                        <h1 class="font-bold text-2xl mb-2">Join a session</h1>
+                        <input type="text" id="joinSessionForm" class="p-5 border border-solid border-gray-400" name="session" placeholder="Enter your session id..." autocomplete="off" /> <br />
+                        <input type="submit" value="Enter" class="mt-4 bg-slate-50 text-neutral-950 py-5 px-10 text-center duration-300 cursor-pointer border-2 border-solid border-slate-950 hover:bg-[#555555] hover:text-white" />
+                    </div>
+                </form>
+            </div>
+            <div class="flex flex-col md:flex-row justify-center items-center text-center gap-4 mt-20">
+                <div class="align-middle">
+                    <h1 class="font-bold text-2xl">Or create one here!</h1>
+                </div>
+                <div>
+                    <button hx-get="createPoll" class="bg-slate-50 text-neutral-950 py-5 px-10 text-center duration-300 cursor-pointer border-2 border-solid border-slate-950 hover:bg-[#555555] hover:text-white">Create poll</button>
+                </div>
+            </div>
+        </div>
+    }
+}
