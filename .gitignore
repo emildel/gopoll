@@ -31,3 +31,7 @@ vcs.xml
 node_modules/
 
 tls/
+
+remote/
+
+bin/

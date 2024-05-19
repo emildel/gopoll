@@ -7,7 +7,8 @@ import (
 	"fmt"
 	"github.com/alexedwards/scs/pgxstore"
 	"github.com/alexedwards/scs/v2"
-	"github.com/emildel/gopoll/frontend/internal/data"
+	ui "github.com/emildel/gopoll"
+	"github.com/emildel/gopoll/internal/data"
 	"github.com/go-playground/form/v4"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/r3labs/sse/v2"
@@ -85,10 +86,6 @@ func main() {
 		sseServer:      sseServer,
 	}
 
-	tlsConfig := &tls.Config{
-		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
-	}
-
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", cfg.port),
 		Handler:      app.routes(),
@@ -96,12 +93,13 @@ func main() {
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		ErrorLog:     slog.NewLogLogger(logger.Handler(), slog.LevelError),
-		TLSConfig:    tlsConfig,
+		TLSConfig:    app.newTlSConfig(),
 	}
 
 	logger.Info("starting server", "addr", server.Addr, "env", cfg.env)
 
-	err = server.ListenAndServeTLS("tls/cert.pem", "tls/key.pem")
+	// Passing in empty params to ListenAndServeTLS since our certificate files are included in tlsConfig
+	err = server.ListenAndServeTLS("", "")
 	if err != nil {
 		panic(err)
 	}
@@ -125,4 +123,31 @@ func openDB(cfg config) (*pgxpool.Pool, error) {
 	dbpool.Config().MaxConnLifetime = duration
 
 	return dbpool, nil
+}
+
+func (app *application) newTlSConfig() *tls.Config {
+	dir, err := ui.TLS.ReadDir("tls")
+	if err != nil {
+		app.logger.Error("error reading directory", "error", err)
+	}
+
+	certSlice := make([][]byte, 2)
+
+	for index, file := range dir {
+		readFile, err := ui.TLS.ReadFile(fmt.Sprintf("tls/%s", file.Name()))
+		if err != nil {
+			app.logger.Error("error reading file", "error", err)
+		}
+		certSlice[index] = readFile
+	}
+
+	certs, err := tls.X509KeyPair(certSlice[0], certSlice[1])
+	if err != nil {
+		app.logger.Error("error loading key pair", "error", err)
+	}
+
+	return &tls.Config{
+		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP256},
+		Certificates:     []tls.Certificate{certs},
+	}
 }

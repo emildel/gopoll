@@ -1,8 +1,8 @@
 package main
 
 import (
-	ui "github.com/emildel/gopoll/frontend"
-	"github.com/emildel/gopoll/frontend/templates"
+	ui "github.com/emildel/gopoll"
+	"github.com/emildel/gopoll/templates"
 	"github.com/julienschmidt/httprouter"
 	"github.com/justinas/alice"
 	"net/http"
