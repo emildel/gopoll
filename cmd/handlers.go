@@ -19,6 +19,7 @@ func (app *application) joinSession(w http.ResponseWriter, r *http.Request) {
 		app.notFound(w)
 		return
 	}
+	session = strings.ToLower(session)
 
 	poll, err := app.models.Polls.Get(session)
 	switch {
