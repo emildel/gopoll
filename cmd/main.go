@@ -99,7 +99,13 @@ func main() {
 	logger.Info("starting server", "addr", server.Addr, "env", cfg.env)
 
 	// Passing in empty params to ListenAndServeTLS since our certificate files are included in tlsConfig
-	err = server.ListenAndServeTLS("", "")
+	if app.config.env != "production" {
+		err = server.ListenAndServeTLS("", "")
+	}
+
+	// If we are running on production, we will use Caddy to manage our TLS certs, so
+	// can simply run the server without passing in any certs
+	err = server.ListenAndServe()
 	if err != nil {
 		panic(err)
 	}

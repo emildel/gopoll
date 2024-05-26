@@ -59,5 +59,5 @@ func getUrlToCopy(pollId, env string) string {
 		return fmt.Sprintf("https://localhost:81/joinPoll?session=%s", pollId)
 	}
 
-	return fmt.Sprintf("some productionurl, %s", pollId)
+	return fmt.Sprintf("https://gopoll.dev/joinPoll?session=%s", pollId)
 }
