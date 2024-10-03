@@ -38,7 +38,7 @@ func CreateSession() templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h1><div class=\"overflow-hidden px-4 min-[601px]:text-center bg-[#FCFDFC]\"><form action=\"/createPoll\" method=\"post\"><div id=\"formInputs\" class=\"mx-auto w-full pr-16 p-5 mt-5 min-[601px]:mt-10 min-[601px]:py-10 min-[601px]:pl-0 max-w-[900px] h-[27rem] overflow-y-auto overscroll-auto min-[601px]:overscroll:contain scrollbar-gutter-stable shadow-lg shadow-slate-200 rounded\"><label for=\"title\" class=\"text-xl float-left w-full min-[601px]:w-1/5\">")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("</h1><div class=\"px-4 min-[601px]:text-center bg-[#FCFDFC]\"><form action=\"/createPoll\" method=\"post\"><div id=\"formInputs\" class=\"mx-auto w-full pr-16 p-5 mt-5 min-[601px]:mt-10 min-[601px]:py-10 min-[601px]:pl-0 max-w-[900px] h-[27rem] overflow-y-auto overscroll-auto min-[601px]:overscroll:contain scrollbar-gutter-stable shadow-lg shadow-slate-200 rounded\"><label for=\"title\" class=\"text-xl float-left w-full min-[601px]:w-1/5\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

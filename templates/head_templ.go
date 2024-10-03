@@ -67,7 +67,7 @@ func Head(title string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a href=\"https://github.com/emildel\" target=\"_blank\" rel=\"noopener noreferrer\"><span class=\"hover:underline text-[#809D80]\">")
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString("<a href=\"https://github.com/emildel\" target=\"_blank\" rel=\"noopener noreferrer\"><span class=\"underline text-[#809D80]\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
