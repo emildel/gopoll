@@ -42,7 +42,7 @@ func (app *application) joinSession(w http.ResponseWriter, r *http.Request) {
 	// Try to get session and convert to string. Only care about the presence of a session, not its value
 	_, pollCreator := app.sessionManager.Get(r.Context(), fmt.Sprintf("PollId%s", session)).(string)
 
-	// If a cookie exists telling us the user created this poll, then render the
+	// If a session exists telling us the user created this poll, then render the
 	// template showing poll results
 	if pollCreator {
 		templates.JoinSession(poll.Title, poll.Answers, poll.Results, session, true, app.config.env).Render(r.Context(), w)
@@ -100,8 +100,8 @@ func (app *application) createPollPOSTWithSession(w http.ResponseWriter, r *http
 
 	err = app.models.Polls.Insert(poll)
 	if err != nil {
-		switch err {
-		case data.ErrDuplicateKey:
+		switch {
+		case errors.Is(err, data.ErrDuplicateKey):
 			// Do something
 			return
 		default:
@@ -120,9 +120,9 @@ func (app *application) createPollPOSTWithSession(w http.ResponseWriter, r *http
 
 func (app *application) answerPoll(w http.ResponseWriter, r *http.Request) {
 
-	var answer data.AnswerPollForm
 	pollId := strings.Split(r.Header.Get("Referer"), "=")[1]
 
+	var answer data.AnswerPollForm
 	err := app.decodePostForm(r, &answer)
 	if err != nil {
 		app.logger.Error("error decoding form when trying to update poll", "pollId", pollId, "error", err)
@@ -138,6 +138,9 @@ func (app *application) answerPoll(w http.ResponseWriter, r *http.Request) {
 		app.serverErrorResponse(w, r, err)
 		return
 	}
+
+	// Add pollId to the session so user cannot answer multiple times on a single poll
+	app.sessionManager.Put(r.Context(), fmt.Sprintf("pollAnswered_%s", pollId), pollId)
 
 	jsonData := map[string]interface{}{
 		"answers": poll.Answers,

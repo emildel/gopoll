@@ -25,7 +25,7 @@ func (app *application) routes() http.Handler {
 		templates.Homepage().Render(r.Context(), w)
 	})
 
-	router.Handler(http.MethodGet, "/joinPoll", dynamic.ThenFunc(app.joinSession))
+	router.Handler(http.MethodGet, "/joinPoll", dynamic.Then(app.alreadyAnsweredMiddleware(app.joinSession)))
 
 	// View the new poll creation page
 	router.HandlerFunc(http.MethodGet, "/createPoll", func(w http.ResponseWriter, r *http.Request) {
@@ -41,11 +41,15 @@ func (app *application) routes() http.Handler {
 	router.Handler(http.MethodPost, "/createPoll/:sessionId", dynamic.ThenFunc(app.createPollPOSTWithSession))
 	router.Handler(http.MethodGet, "/createPoll/:sessionId", dynamic.ThenFunc(app.createPollGETWithSession))
 
-	router.HandlerFunc(http.MethodPost, "/answerPoll", app.answerPoll)
+	router.Handler(http.MethodPost, "/answerPoll", dynamic.ThenFunc(app.answerPoll))
 
 	//sseEnabled := dynamic.Append(app.sseActivated)
 
 	router.HandlerFunc(http.MethodGet, "/updateChart/:sessionId", app.sseServer.ServeHTTP)
+
+	router.HandlerFunc(http.MethodGet, "/answered", func(w http.ResponseWriter, r *http.Request) {
+		templates.PollAnswered().Render(r.Context(), w)
+	})
 
 	return router
 }
