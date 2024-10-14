@@ -13,4 +13,4 @@ EXPOSE 8080
 
 RUN chmod +x gopoll-build
 
-CMD ["./gopoll-build"]
+CMD ["./gopoll-build", "-port=8080", "-environment=test-dev"]
