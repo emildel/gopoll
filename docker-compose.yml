@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+#  container name
+  gopoll-app:
+    build:
+      context: .
+      dockerfile: ./gopoll.dockerfile
+    restart: always
+    ports:
+#     Access port 80 of the docker container through port 8080 of my localhost
+      - "8080:80"
+    deploy:
+      mode: replicated
+      replicas: 1
+
