@@ -37,3 +37,7 @@ remote/
 bin/
 
 Makefile
+
+db-data/
+
+.env

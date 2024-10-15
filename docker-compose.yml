@@ -1,5 +1,3 @@
-version: '3'
-
 services:
 #  container name
   gopoll-app:
@@ -10,7 +8,41 @@ services:
     ports:
 #     Access port 80 of the docker container through port 8080 of my localhost
       - "8080:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
     deploy:
       mode: replicated
       replicas: 1
+    environment:
+      GOPOLL_DB_DSN: postgres://gopoll:${DB_PASSWORD}@postgres/gopoll
 
+  postgres:
+    image: 'postgres:14.0'
+    ports:
+      - "5432:5432"
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      POSTGRES_USER: gopoll
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: gopoll
+    volumes:
+      - ./db-data/postgres/:/var/lib/postgresql/data/
+    healthcheck:
+      test: pg_isready -U "$$POSTGRES_USER" -d  "$$POSTGRES_DB"
+      interval: 10s
+      timeout: 2s
+      retries: 10
+
+  migrate:
+    image: migrate/migrate
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./migrations:/database
+    command:
+      [ "-path", "/database", "-database", "postgres://gopoll:${DB_PASSWORD}@postgres/gopoll?sslmode=disable", "up" ]
