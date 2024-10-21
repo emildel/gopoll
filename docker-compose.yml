@@ -1,13 +1,14 @@
 services:
-#  container name
-  gopoll-app:
-    build:
-      context: .
-      dockerfile: ./gopoll.dockerfile
+
+  app:
+    image: emildelvaux/gopoll-app
+    container_name: gopoll
     restart: always
+    networks:
+      - caddy
     ports:
-#     Access port 80 of the docker container through port 8080 of my localhost
-      - "8080:80"
+#     Access port 80 of the docker container through port 4000 of my localhost
+      - "4000:80"
     depends_on:
       postgres:
         condition: service_healthy
@@ -19,6 +20,9 @@ services:
 
   postgres:
     image: 'postgres:14.0'
+    container_name: gopoll-postgres
+    networks:
+      - caddy
     ports:
       - "5432:5432"
     restart: always
@@ -37,12 +41,36 @@ services:
       timeout: 2s
       retries: 10
 
+  caddy:
+    image: caddy:2.8.4
+    restart: unless-stopped
+    container_name: caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - caddy
+
   migrate:
     image: migrate/migrate
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - caddy
     volumes:
       - ./migrations:/database
     command:
       [ "-path", "/database", "-database", "postgres://gopoll:${DB_PASSWORD}@postgres/gopoll?sslmode=disable", "up" ]
+
+networks:
+  caddy:
+
+volumes:
+  caddy_data:
+    external: true
+  caddy_config:

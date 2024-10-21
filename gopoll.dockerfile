@@ -1,4 +1,6 @@
-FROM golang:1.21.4-alpine
+FROM --platform=$BUILDPLATFORM golang:alpine AS build
+ARG TARGETOS
+ARG TARGETARCH
 
 WORKDIR /gopoll
 
@@ -7,10 +9,7 @@ RUN go mod download
 
 COPY . ./
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o gopoll-build ./cmd
+RUN GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build -ldflags='-s -w' -o gopoll-build ./cmd && \
+    chmod +x gopoll-build
 
-EXPOSE 8080
-
-RUN chmod +x gopoll-build
-
-CMD ["./gopoll-build", "-port=80", "-environment=test-dev"]
+CMD ["./gopoll-build", "-port=80", "-environment=production"]

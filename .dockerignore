@@ -1,0 +1,6 @@
+.gitignore
+.README.md
+.env
+
+/remote
+/bin
