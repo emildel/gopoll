@@ -37,3 +37,10 @@ remote/
 bin/
 
 Makefile
+
+db-data/
+
+.env
+
+caddy_config/
+caddy_data/

@@ -1,0 +1,7 @@
+{
+    email delvauxemil@gmail.com
+}
+
+localhost {
+    reverse_proxy localhost:4000
+}

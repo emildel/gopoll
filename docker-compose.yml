@@ -1,0 +1,76 @@
+services:
+
+  app:
+    image: emildelvaux/gopoll-app
+    container_name: gopoll
+    restart: always
+    networks:
+      - caddy
+    ports:
+#     Access port 80 of the docker container through port 4000 of my localhost
+      - "4000:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      GOPOLL_DB_DSN: postgres://gopoll:${DB_PASSWORD}@postgres/gopoll
+
+  postgres:
+    image: 'postgres:14.0'
+    container_name: gopoll-postgres
+    networks:
+      - caddy
+    ports:
+      - "5432:5432"
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      POSTGRES_USER: gopoll
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: gopoll
+    volumes:
+      - ./db-data/postgres/:/var/lib/postgresql/data/
+    healthcheck:
+      test: pg_isready -U "$$POSTGRES_USER" -d  "$$POSTGRES_DB"
+      interval: 10s
+      timeout: 2s
+      retries: 10
+
+  caddy:
+    image: caddy:2.8.4
+    restart: unless-stopped
+    container_name: caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      - caddy
+
+  migrate:
+    image: migrate/migrate
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - caddy
+    volumes:
+      - ./migrations:/database
+    command:
+      [ "-path", "/database", "-database", "postgres://gopoll:${DB_PASSWORD}@postgres/gopoll?sslmode=disable", "up" ]
+
+networks:
+  caddy:
+
+volumes:
+  caddy_data:
+    external: true
+  caddy_config:
